@@ -1,3 +1,6 @@
+//yahoo finance api, innen nem tudom kiszedni a kiadott jsont
+
+
 var util = require('util');
 
 require('colors');

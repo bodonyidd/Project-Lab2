@@ -23,6 +23,6 @@ var out = cells.map(function (el) {
 
 
 var json = JSON.stringify(out);
-console.log(json)
+// console.log(json)
 // console.log(JSON.stringify(out, null, 2));
 
