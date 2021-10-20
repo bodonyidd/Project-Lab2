@@ -47,7 +47,7 @@ const stocks=JSON.parse(json)
 
 
 app.set('view engine', 'ejs')
-
+app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  (req, res) => {
   res.render('allStocks.ejs',{ stocks: stocks })
 })
