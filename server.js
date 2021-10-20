@@ -38,7 +38,7 @@ var json = JSON.stringify(out);
 
 const express = require('express')
 const mongoose = require('mongoose')
-const Stock= require('./models/stockModel')
+const Stock= require('./models/stockModelcopy')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
 //ez nem akar működni xdd
 
@@ -58,22 +58,45 @@ const app = express()
 console.log()
 
 
-const stocks1=JSON.parse(json)
+const stocks=JSON.parse(json)
 
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  (req, res) => {
-  res.render('allStocks.ejs',{ stocks1: stocks })
-  ,console.log(stocks1.Symbol)
+  res.render('allStocks.ejs',{ stocks: stocks })
+  ,console.log(stocks.Symbol)
 })
 //
-app.get(app.get('/blog',  (req, res) => {
-  const asd123 = new Stock({
-    Symbol: 'Proba22',
-    Description: 'Proba22'
+
+//Teszt- valamiért az asd123on belül egy stocks collectiont létrehoz ,nem igazán értem miért és hogy honnan jött ez a név
+//annyi biztos h  nem a const [stock] miatt= new Stock miatt; a  new [Stock] miatt lesz stocks,(?)
+//nem is a const Stock= require miatt (modul exportálás) van ez.
+//StockModelben lévő string miatt lesz az, 'const Stock = mongoose.model(['Stock'], stockSchema)' ,ennek a collection nevének kell lennie
+// és akkor oda rakja be ténylegesen,nem kreál másikat
+//akkor kerül beírásra ha megnyitjuk az oldalt!!!
+
+// app.get('/blog',  (req, res) => {
+//   const stock = new Stock({
+//     Symbol: 'Proba2222',
+//     Description: 'Proba2222'
+//   });
+//   stock.save()
+//   .then((result) => {
+//     res.send(result)
+//   })
+//   .catch((err) => {
+//     console.log(err)
+//   })
+
+// })
+
+app.get('/allblog',  (req, res) => {
+  const stock = new Stock({
+    Symbol: 'P',
+    Description: 'P'
   });
-  asd123.save()
+  stock.save()
   .then((result) => {
     res.send(result)
   })
@@ -81,12 +104,12 @@ app.get(app.get('/blog',  (req, res) => {
     console.log(err)
   })
 
-}))
+})
 
 //még nem működik
-app.get('/show/:stocks1.Symbol',  (req, res) => {
+app.get('/show/:stocks.Symbol',  (req, res) => {
   console.log("asd")
-  const Symbol= req.params.stocks1.Symbol
+  const Symbol= req.params.stocks.Symbol
   console.log(Symbol)
   
 // yahooFinance.historical({
