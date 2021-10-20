@@ -91,20 +91,28 @@ app.get('/',  (req, res) => {
 
 // })
 
-app.get('/allblog',  (req, res) => {
-  const stock = new Stock({
-    Symbol: 'P',
-    Description: 'P'
-  });
-  stock.save()
-  .then((result) => {
-    res.send(result)
-  })
-  .catch((err) => {
-    console.log(err)
-  })
+// app.get('/blog',  (req, res) => {
+//   const stock = new Stock({
+//     Symbol: 'P',
+//     Description: 'P'
+//   });
+//   stock.save()
+//   .then((result) => {
+//     res.send(result)
+//   })
+//   .catch((err) => {
+//     console.log(err)
+//   })
 
-})
+// })
+
+//ez megjeleníti az összes stockot, mongodb-be betoltam a nasdaq.txt (csvben)
+app.get('/allblog',  (req, res) => {
+  Stock.find().then((results) => {
+    res.send(results)
+  })
+}
+)
 
 //még nem működik
 app.get('/show/:stocks.Symbol',  (req, res) => {
