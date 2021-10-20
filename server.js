@@ -1,3 +1,10 @@
+
+var util = require('util');
+require('colors');
+var yahooFinance = require('yahoo-finance');
+
+
+
 //from fileRead.js:
 var fs = require('fs');
 
@@ -30,35 +37,67 @@ var json = JSON.stringify(out);
 
 
 const express = require('express')
-// const mongoose = require('mongoose')
-
+const mongoose = require('mongoose')
+const Stock= require('./models/stockModel')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
 //ez nem akar működni xdd
 
+//stocksAtlasOne
+const dbURI="mongodb+srv://user1:test1234@cluster0.vaq5p.mongodb.net/asd123?retryWrites=true&w=majority"
+mongoose.connect(dbURI,{ useNewUrlParser: true, useUnifiedTopology: true})
+.then((result) => {
+                  console.log("connected to db"),
+                  app.listen(3000)
+                }) 
+.catch((error) => console.log(error)) //.then mert async function, catchel a hibát írjuk ki.
 
-
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
+const { render } = require('ejs');
 const app = express()
 
 console.log()
 
 
-const stocks=JSON.parse(json)
+const stocks1=JSON.parse(json)
 
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  (req, res) => {
-  res.render('allStocks.ejs',{ stocks: stocks })
+  res.render('allStocks.ejs',{ stocks1: stocks })
+  ,console.log(stocks1.Symbol)
 })
 //
+app.get(app.get('/blog',  (req, res) => {
+  const asd123 = new Stock({
+    Symbol: 'Proba22',
+    Description: 'Proba22'
+  });
+  asd123.save()
+  .then((result) => {
+    res.send(result)
+  })
+  .catch((err) => {
+    console.log(err)
+  })
 
+}))
 
 //még nem működik
-app.get('/articles/show/:stocks.Symbol}',  (req, res) => {
-  res.send(req.Symbol)
+app.get('/show/:stocks1.Symbol',  (req, res) => {
+  console.log("asd")
+  const Symbol= req.params.stocks1.Symbol
+  console.log(Symbol)
+  
+// yahooFinance.historical({
+//   symbol: Symbol,
+//   from: '2012-01-01',
+//   to: '2021-10-21',
+//   period: 'd'
+// }).then(quotes=>{res.render('show', {stocks: Symbol, title: 'asd'})})
+
+  
 })
-//dfdf
+//dfdfdf
 
 // fdfghgd
-app.listen(3000)
