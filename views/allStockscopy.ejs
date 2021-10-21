@@ -157,16 +157,14 @@
 <!-- <h1>Heading</h1> -->
 
 <!-- <h3>Here are your favourite stocks!</h3> -->
-<h3>Here are your favourite NASDAQ stocks </h3>
+<h3>Here are all of the NASDAQ stocks </h3>
 
 <!-- <form action="/logout?_method=DELETE" method="POST">
   <button type="submit">Log Out</button>
 </form> -->
 
 
-<p>
-    <% if (result.length > 0) { %>
-   <% result.forEach(result => { %>
+<p><% result.forEach(result => { %>
 	<div class="card mt-4">
 	  <div class="card-body">
 		<h4 class="card-title"><%= result.Description %></h4>
@@ -178,10 +176,7 @@
 		</form> -->
 	  </div>
 	</div>
-  <% }) %>
-<% } else  { %> 
-        There are no stocks to display
-    <% }  %> </p>
+  <% }) %></p>
 </article>
 </main>
 

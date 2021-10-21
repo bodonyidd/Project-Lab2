@@ -108,9 +108,29 @@ app.get('/',  (req, res) => {
 
 //ez megjeleníti az összes stockot, mongodb-be betoltam a nasdaq.txt (csvben)
 app.get('/allblog',  (req, res) => {
-  Stock.find().then((results) => {
+  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  
+  Stock.find()
+  .then((results) => {
     res.send(results)
   })
+  .catch((err) => {
+        console.log(err)
+      })
+}
+)
+
+app.get('/favourites',  (req, res) => {
+  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  
+  Stock.find()
+  .then((result) => {
+
+    res.render('fav', {result: result})
+  })
+  .catch((err) => {
+        console.log(err)
+      })
 }
 )
 
