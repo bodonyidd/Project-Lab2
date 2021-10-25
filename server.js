@@ -17,7 +17,7 @@ try {
 } catch(e) {
     console.log('Error:', e.stack);
 }
-//--------------
+//---------------
 
 
 // module.exports= ready
@@ -42,14 +42,18 @@ var json = JSON.stringify(out);
 
 const express = require('express')
 const mongoose = require('mongoose')
-const Stock= require('./models/stockModelcopy')
+const Stock= require('./models/stockModel')
+const User= require('./models/userModel')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
 //ez nem akar működni 
 
+//Project: Cluster0
 //DB: stocksAtlasOne
 //user1
 //test1234
-//DB: asd123
+//proba DB: asd123
+
+//ide a DB nevét kell írni
 const dbURI="mongodb+srv://user1:test1234@cluster0.vaq5p.mongodb.net/stocksAtlasOne?retryWrites=true&w=majority"
 mongoose.connect(dbURI,{ useNewUrlParser: true, useUnifiedTopology: true})
 .then((result) => {
@@ -117,7 +121,7 @@ app.get('/',  (req, res) => {
 // })
 
 //ez megjeleníti az összes stockot, mongodb-be betoltam a nasdaq.txt (csvben)
-app.get('/allblog',  (req, res) => {
+app.get('/db',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
   Stock.find()

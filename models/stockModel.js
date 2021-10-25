@@ -1,4 +1,4 @@
-//kell majd a mongodbhez
+//Schema: kell a mongodbhez
 
 const mongoose= require('mongoose')
 
@@ -17,5 +17,5 @@ const stockSchema = new  mongoose.Schema({
     
 })
 
-const Stock = mongoose.model('Stock', stockSchema)
+const Stock = mongoose.model('stocks', stockSchema) //stocks: Collection név kell (alséma)
 module.exports = Stock;
