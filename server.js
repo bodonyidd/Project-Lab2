@@ -1,4 +1,5 @@
-
+//file beolvasás
+//--------------
 var util = require('util');
 require('colors');
 var yahooFinance = require('yahoo-finance');
@@ -16,6 +17,9 @@ try {
 } catch(e) {
     console.log('Error:', e.stack);
 }
+//--------------
+
+
 // module.exports= ready
 
 //https://stackoverflow.com/questions/36120265/how-to-convert-text-file-to-json-in-javascript
@@ -40,10 +44,13 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Stock= require('./models/stockModelcopy')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
-//ez nem akar működni xdd
+//ez nem akar működni 
 
-//stocksAtlasOne
-const dbURI="mongodb+srv://user1:test1234@cluster0.vaq5p.mongodb.net/asd123?retryWrites=true&w=majority"
+//DB: stocksAtlasOne
+//user1
+//test1234
+//DB: asd123
+const dbURI="mongodb+srv://user1:test1234@cluster0.vaq5p.mongodb.net/stocksAtlasOne?retryWrites=true&w=majority"
 mongoose.connect(dbURI,{ useNewUrlParser: true, useUnifiedTopology: true})
 .then((result) => {
                   console.log("connected to db"),
@@ -69,12 +76,15 @@ app.get('/',  (req, res) => {
 })
 //
 
-//Teszt- valamiért az asd123on belül egy stocks collectiont létrehoz ,nem igazán értem miért és hogy honnan jött ez a név
+//Teszt- valamiért az asd123on belül egy 'stocks' collectiont létrehoz ,nem igazán értem miért és hogy honnan jött ez a név
 //annyi biztos h  nem a const [stock] miatt= new Stock miatt; a  new [Stock] miatt lesz stocks,(?)
 //nem is a const Stock= require miatt (modul exportálás) van ez.
 //StockModelben lévő string miatt lesz az, 'const Stock = mongoose.model(['Stock'], stockSchema)' ,ennek a collection nevének kell lennie
 // és akkor oda rakja be ténylegesen,nem kreál másikat
 //akkor kerül beírásra ha megnyitjuk az oldalt!!!
+
+
+
 
 // app.get('/blog',  (req, res) => {
 //   const stock = new Stock({
@@ -119,6 +129,7 @@ app.get('/allblog',  (req, res) => {
       })
 }
 )
+
 
 app.get('/favourites',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
