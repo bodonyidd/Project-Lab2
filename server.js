@@ -149,17 +149,44 @@ app.get('/stocks',  (req, res) => {
 }
 )
 
+var util = require('util');
+var yahooFinance = require('yahoo-finance');
 //már működik
-app.get('/stocks/:Symbol',  (req, res) => {
+
+app.get('/stocks/:Symbol', async (req, res) => {
   const symbol= req.params.Symbol
   // console.log(Symbol)
+  
+  var d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + (d.getDate()+1),
+    year = d.getFullYear();
+
+if (month.length < 2) 
+    month = '0' + month;
+if (day.length < 2) 
+    day = '0' + day;
+
+  stockDate=[year, month, day].join('-')
+  let eredmeny=await   yahooFinance.historical({
+    symbol: symbol,
+    from: '2012-01-01',
+    to: stockDate,//'2021-10-16',
+    period: 'd'
+    });
+  //   , function (quotes) {
+  //     eredmeny=quotes
+  //   }).then(eredmeny=quotes)
+  // //
+  console.log( JSON.stringify(eredmeny[0]))
   Stock.findOne({Symbol: symbol})
   .then(result => {
-    res.render('show', {stock: result})
-  })//show: amit megjelenítsen oldal
+    res.render('show', {stock: result, price: eredmeny[0]})
+  })//show: view, amit megjelenítsen oldal
   .catch((err) => {
     console.log(err)
   })
+
 
 
 
