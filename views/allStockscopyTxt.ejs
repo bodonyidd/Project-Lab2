@@ -164,14 +164,14 @@
 </form> -->
 
 
-<p><% result.forEach(result => { %>
+<p><% stocks.forEach(stocks => { %>
 	<div class="card mt-4">
 	  <div class="card-body">
-		<h4 class="card-title"><%= result.Description %></h4>
-		<div class="card-text mb-2"><%= result.Symbol %></div>
-		<a href="/show/<%= result.Symbol %>" class="btn btn-success">Read More</a>
-		<!-- <a href="/asd/<%= result.id %>" class="btn btn-warning">Edit</a> -->
-		<!-- <form action="/articles/<%= result.id %>?_method=DELETE" method="POST" class="d-inline">
+		<h4 class="card-title"><%= stocks.Description %></h4>
+		<div class="card-text mb-2"><%= stocks.Symbol %></div>
+		<a href="/show/<%= stocks.Symbol %>" class="btn btn-success">Read More</a>
+		<!-- <a href="/asd/<%= stocks.id %>" class="btn btn-warning">Edit</a> -->
+		<!-- <form action="/articles/<%= stocks.id %>?_method=DELETE" method="POST" class="d-inline">
 		  <button type="submit" class="btn btn-danger">Delete</button>
 		</form> -->
 	  </div>

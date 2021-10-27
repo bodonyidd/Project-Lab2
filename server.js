@@ -75,8 +75,9 @@ const stocks=JSON.parse(json)
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  (req, res) => {
-  res.render('allStocks.ejs',{ stocks: stocks })
-  ,console.log(stocks.Symbol)
+  // res.render('allStocks.ejs',{ stocks: stocks })
+  // ,console.log(stocks.Symbol)
+  res.redirect('/stocks')
 })
 //
 
@@ -134,6 +135,33 @@ app.get('/db',  (req, res) => {
 }
 )
 
+app.get('/stocks',  (req, res) => {
+  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  
+  Stock.find()
+  .then((result) => {
+
+    res.render('allStocks', {result: result})
+  })
+  .catch((err) => {
+        console.log(err)
+      })
+}
+)
+
+//már működik
+app.get('/stocks/:Symbol',  (req, res) => {
+  const symbol= req.params.Symbol
+  // console.log(Symbol)
+  Stock.findOne({Symbol: symbol})
+  .then(result => {
+    res.render('show', {stock: result})
+  })//show: amit megjelenítsen oldal
+  .catch((err) => {
+    console.log(err)
+  })
+
+
 
 app.get('/favourites',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
@@ -148,12 +176,8 @@ app.get('/favourites',  (req, res) => {
       })
 }
 )
+//
 
-//még nem működik
-app.get('/show/:stocks.Symbol',  (req, res) => {
-  console.log("asd")
-  const Symbol= req.params.stocks.Symbol
-  console.log(Symbol)
   
 // yahooFinance.historical({
 //   symbol: Symbol,
