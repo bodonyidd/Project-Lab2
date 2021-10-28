@@ -178,22 +178,23 @@ if (day.length < 2)
   //     eredmeny=quotes
   //   }).then(eredmeny=quotes)
   // //
-  console.log( JSON.stringify(eredmeny[0]))
+  //console.log( JSON.stringify(eredmeny[0]))
   Stock.findOne({Symbol: symbol})
-  .then(result => {
-    res.render('show', {stock: result, price: eredmeny[0]})
+  .then(output => {
+    
+    res.render('show', {output: output, price: eredmeny[0]})
   })//show: view, amit megjelenítsen oldal
   .catch((err) => {
     console.log(err)
   })
 
-
+})
 
 
 app.get('/favourites',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
-  Stock.find()
+   Stock.find()
   .then((result) => {
 
     res.render('fav', {result: result})
@@ -204,7 +205,66 @@ app.get('/favourites',  (req, res) => {
 }
 )
 //
+app.get('/favourites',  (req, res) => {
+  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  
+   Stock.find()
+  .then((result) => {
 
+    res.render('fav', {result: result})
+  })
+  .catch((err) => {
+        console.log(err)
+      })
+}
+)
+
+app.get('/search',  async (req, res) => {
+  // res.render('search')
+  
+  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  //var data= req.query
+  //res.render('proba', {kuki: data})
+  let searchOptions={}
+  
+  if ((req.query.Symbol != null && req.query.Symbol != "")){
+    // console.log(req.query)
+    // console.log(req.query.Symbol)
+    //searchOptions.ticker = new RegExp(req.query.ticker, 'i') //i : case insensitive
+    searchOptions.Symbol = req.query.Symbol.toUpperCase()
+  
+  
+    // console.log(searchOptions.Symbol)
+    // console.log(searchOptions)
+    let result = await Stock.find(searchOptions)//{Symbol: searchOptions})
+    // console.log(result)
+    res.render('search', {result: result, searchOptions: req.query})
+  
+  // .catch((err) => {
+  //       console.log(err)
+  //     })
+}
+else if (req.query.Description != null && req.query.Description != "") {
+
+  searchOptions.Description = new RegExp(req.query.Description, 'i')
+  // console.log(searchOptions.Description)
+  // console.log(searchOptions)
+  let result = await Stock.find(searchOptions)//{Symbol: searchOptions})
+  // console.log(result)
+  res.render('search', {result: result, searchOptions: req.query})
+}
+else {
+  Stock.find({Symbol:'TSLA'})
+  .then((result) => {
+
+    res.render('search', {result: result, searchOptions: req.query})
+  })
+  .catch((err) => {
+        console.log(err)
+      })
+      }
+}
+)
   
 // yahooFinance.historical({
 //   symbol: Symbol,
@@ -214,7 +274,7 @@ app.get('/favourites',  (req, res) => {
 // }).then(quotes=>{res.render('show', {stocks: Symbol, title: 'asd'})})
 
   
-})
+
 //dfdfdf
 
 // fdfghgd

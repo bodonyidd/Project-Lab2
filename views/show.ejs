@@ -43,6 +43,7 @@
 		}
 		
 		#footer {
+			position: relative;
 			clear: both;
 		}
 		
@@ -64,6 +65,7 @@
 		/* Fix for the footer */
 		* html body {
 			overflow: hidden;
+			position: relative;
 		}
 		
 		* html #footer-wrapper {
@@ -103,6 +105,7 @@
 		}
 
 		#header, #footer {
+			position: relative;
 			font-size: large;
 			padding: 0.3em;
 			background: #BCCE98;
@@ -143,23 +146,22 @@
 
 <div id="container"><main class="column" id="center">
 <article>
-<!-- <h1>Heading</h1> -->
 
-<!-- <h3>Here are your favourite stocks!</h3> -->
-<h3 class="mb-4" >Here is all our info about: </h3>
+<h3 class="mb-4"> Here is all our info about: </h3>
 
 
-<h4 style="color:red"> <%= stock.Description%></h4>
-<p><%= stock.Symbol %></p>
+	
+	<h4 class="text-danger"> <%= output["Description"] %> </h4>
+	<p> <%= output["Symbol"] %> </p>
 
-  <h5 class='mb-4'>Last update: <%= price["date"]  %></h4>
+  <h5 class='mb-4'> Last update: <%= price["date"]  %></h5>
   
   <h5>Prices:</h5>
   <h5>Open: <%= price["open"]  %> $</h5>
   <h5>High: <%= price["high"]  %> $</h5>
   <h5>Low: <%= price["low"]  %> $</h5>
   <h5>Close: <%= price["close"]  %> $</h5>
-  <h5>Volume: <%= price["volume"]  > </h5>
+  <h5>Volume: <%= price["volume"]   %> </h5>
   
 </article>
 </main>
