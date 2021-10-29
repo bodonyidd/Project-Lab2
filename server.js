@@ -191,19 +191,19 @@ if (day.length < 2)
 })
 
 
-app.get('/favourites',  (req, res) => {
-  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+ app.get('/asd',  (req, res) => {
+//   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
-   Stock.find()
-  .then((result) => {
-
-    res.render('fav', {result: result})
-  })
-  .catch((err) => {
-        console.log(err)
-      })
-}
-)
+//    Stock.find()
+//   .then((result) => {
+  res.render('asd')
+//     res.render('fav', {result: result})
+//   })
+//   .catch((err) => {
+//         console.log(err)
+//       })
+ }
+ )
 //
 app.get('/favourites',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
@@ -220,7 +220,6 @@ app.get('/favourites',  (req, res) => {
 )
 
 app.get('/search',  async (req, res) => {
-  // res.render('search')
   
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   //var data= req.query
