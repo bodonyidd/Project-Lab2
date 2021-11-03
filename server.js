@@ -47,6 +47,8 @@ const User= require('./models/userModel')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
 //ez nem akar működni 
 
+const authRoutes = require('./routes/authRoutes')
+
 //Project: Cluster0
 //DB: stocksAtlasOne
 //user1
@@ -70,8 +72,11 @@ console.log()
 
 
 const stocks=JSON.parse(json)
+//middleware: publicban elhelyezett képek megjelenítéséhez,css ekhez szükséges
+app.use(express.static('public'))
 
 
+//view engine
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  (req, res) => {
@@ -181,8 +186,10 @@ if (day.length < 2)
   //console.log( JSON.stringify(eredmeny[0]))
   Stock.findOne({Symbol: symbol})
   .then(output => {
-    
-    res.render('show', {output: output, price: eredmeny[0]})
+    console.log("out"+output)
+    console.log(typeof output);
+    console.log()
+     res.render('show')//, {output: output, price: eredmeny[0]})
   })//show: view, amit megjelenítsen oldal
   .catch((err) => {
     console.log(err)
@@ -265,6 +272,8 @@ else {
 }
 )
   
+
+app.use(authRoutes)
 // yahooFinance.historical({
 //   symbol: Symbol,
 //   from: '2012-01-01',
