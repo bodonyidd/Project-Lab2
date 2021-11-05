@@ -1,12 +1,12 @@
 const User=require('../models/userModel')
 
-
+//custom error messages
 //handle errors
 const handleErrors = (err) => {
     console.log(err.message, err.code)
     let errors = {name:'', email: '', password: ''}
 
-    //duplicatio key error
+    //duplication key error
     if (err.code === 11000){
         errors.email = "This email is already used by another user"
         return errors
