@@ -1,5 +1,5 @@
 //Schema: kell a mongodbhez
-
+//schema definiálja ,hogy hogyan néz ki az adat a databaseben
 const mongoose= require('mongoose')
 
 

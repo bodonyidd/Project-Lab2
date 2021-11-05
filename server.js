@@ -35,6 +35,7 @@ var out = cells.map(function (el) {
 
 
 var json = JSON.stringify(out);
+const stocks=JSON.parse(json)
 // console.log(json)
 // console.log(JSON.stringify(out, null, 2));
 
@@ -46,6 +47,8 @@ const Stock= require('./models/stockModel')
 const User= require('./models/userModel')
 const ready = require('./fileRead') // sima 'fileRead' hibát ad 
 //ez nem akar működni 
+
+
 
 const authRoutes = require('./routes/authRoutes')
 
@@ -71,10 +74,12 @@ const app = express()
 console.log()
 
 
-const stocks=JSON.parse(json)
+
+
 //middleware: publicban elhelyezett képek megjelenítéséhez,css ekhez szükséges
 app.use(express.static('public'))
 
+app.use(express.json()) //postman teszthez
 
 //view engine
 app.set('view engine', 'ejs')
@@ -189,7 +194,7 @@ if (day.length < 2)
     console.log("out"+output)
     console.log(typeof output);
     console.log()
-     res.render('show')//, {output: output, price: eredmeny[0]})
+     res.render('show', {output: output, price: eredmeny[0]})
   })//show: view, amit megjelenítsen oldal
   .catch((err) => {
     console.log(err)
