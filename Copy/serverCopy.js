@@ -1,10 +1,54 @@
+//file beolvasás
+//--------------
+var util = require('util');
 require('colors');
+var yahooFinance = require('yahoo-finance');
+
+
+
+//from fileRead.js:
+var fs = require('fs');
+
+try {  
+    
+        var data = fs.readFileSync('NASDAQ.txt', 'utf8');
+    // console.log(data.toString()); 
+       
+} catch(e) {
+    console.log('Error:', e.stack);
+}
+//---------------
+
+
+// module.exports= ready
+
+//https://stackoverflow.com/questions/36120265/how-to-convert-text-file-to-json-in-javascript
+var cells = data.split('\n').map(function (el) { return el.replace(/\r/,'').split(/\t/) });
+var headings = cells.shift();
+var out = cells.map(function (el) {
+  var obj = {};
+  for (var i = 0, l = el.length; i < l; i++) {
+    obj[headings[i]] = isNaN(Number(el[i])) ? el[i] : +el[i];
+  }
+  return obj;
+});
+
+
+var json = JSON.stringify(out);
+const stocks=JSON.parse(json)
+// console.log(json)
+// console.log(JSON.stringify(out, null, 2));
+
+
+
 const express = require('express')
 const mongoose = require('mongoose')
 const Stock= require('./models/stockModel')
 const User= require('./models/userModel')
-const cookieParser = require('cookie-parser')
-const {requireAuth} = require('./middleware/authMiddleware')
+const ready = require('./fileRead') // sima 'fileRead' hibát ad 
+//ez nem akar működni 
+
+
 
 const authRoutes = require('./routes/authRoutes')
 
@@ -34,14 +78,13 @@ console.log()
 
 //middleware: publicban elhelyezett képek megjelenítéséhez,css ekhez szükséges
 app.use(express.static('public'))
-app.use(express.json()) //postman teszthez ,(backend teszt)
 
-app.use(cookieParser())
+app.use(express.json()) //postman teszthez
 
 //view engine
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: true })) //for accepting form data
-app.get('/',  requireAuth , (req, res) => {
+app.get('/',  (req, res) => {
   // res.render('allStocks.ejs',{ stocks: stocks })
   // ,console.log(stocks.Symbol)
   res.redirect('/stocks')
@@ -102,7 +145,7 @@ app.get('/db',  (req, res) => {
 }
 )
 
-app.get('/stocks', requireAuth, (req, res) => {
+app.get('/stocks',  (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
   Stock.find()
@@ -118,7 +161,7 @@ app.get('/stocks', requireAuth, (req, res) => {
 
 var util = require('util');
 var yahooFinance = require('yahoo-finance');
-
+//már működik
 
 app.get('/stocks/:Symbol', async (req, res) => {
   const symbol= req.params.Symbol
@@ -244,28 +287,17 @@ app.use(authRoutes)
 // }).then(quotes=>{res.render('show', {stocks: Symbol, title: 'asd'})})
 
 //cookie beállítás
-  // app.get('/set-cookies', (req,res) => {
-  //   //cookie vizsgálat > jobb klikk vizsgálat> konzol> document.cookie , cokkies pedig a 'Tároló' /'applications' részen
-  //   //to deal with cookies > cookie-parser
-  
-  //   // res.setHeader('Set-Cookie', 'newUser=True')
-  //   // a .setHeader-es és a .cookie-s ugynazt csinálja de később a .cookiesat könnyebb lesz accesselni
-  //   res.cookie('newUser',false)
-  //   // res.cookie('isAdmin', false, {maxAge: 1000*60*60*24}) //maxAge: a cookie expires ideje: 1000 miliszekundum*60 sec *60 perc *24 óra= 1 nap miliszekundumban
-  //   // res.cookie('isAdmin', false, {maxAge: 1000*60*60*24,secure: true}) //secure: a cookie csak akkor kerül elküldésre ha https connectionünk van
-  //   res.cookie('isAdmin', true, {maxAge: 1000*60*60*24,httpOnly: true}) //a vizsgálat/konzol részen nem érhető el az értéke a cookienak,a frontenden nem érhető el,és csak http protokollon lehet átküldeni
-  //   res.send('you got the cookies')
+app.get('/set-cookies', (req,res) => {
+  res.setHeader('Set-Cookie', 'newUser=True')
+  //cookie vizsgálat > jobb klikk vizsgálat> konzol> document.cookie , cokkies pedig a 'Tároló' /'applications' részen
+  //to deal with cookies > cookie-parser
+  res.send('you got the cookies')
+})
 
 
-  // })
-
-
-  // app.get('/read-cookies', (req,res) => {
-  //   //cookies-parser package segítségével lehet a req,res en keresztül elérni a cookiekat
-  //   const cookies  = req.cookies
-  //   console.log(cookies)
-  //   res.json(cookies)
-  // })
+app.get('/read-cookies', (req,res) => {
+  res.setHeader('Set')
+})
 
 //dfdfdf
 

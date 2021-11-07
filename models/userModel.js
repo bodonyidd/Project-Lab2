@@ -24,8 +24,8 @@ const userSchema = new  mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide your password']
-        //minLength: 6
+        required: [true, 'Please provide your password'],
+        minLength: [3, 'The password should contain atleast 3 charackters']
     },
     favourites: [String]
 })
@@ -63,6 +63,21 @@ userSchema.pre('save', async function(next) {
     //egy plain textként tárolt jelszó esetén egyezni 
  })
 
+
+ //satic method to login user, bejelentkezéshez kell
+ //a login a .statics. után a methódunk neve,amit kreálunk
+ userSchema.statics.login = async function(email,password){
+     //thissel a User instancre modelre mutatunk
+
+    //  const user = await this.findOne({email: email}) //ez ugyanaz mint az alatta lévő
+    const user = await this.findOne({ email })
+    if(user) {
+        const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
+        if (auth){
+            return user 
+        }throw Error('incorrect password')
+    }throw Error('incorrect email')
+ }
 
 const User = mongoose.model('User', userSchema)
 
