@@ -1,1 +1,0 @@
-//mi hova navigál 

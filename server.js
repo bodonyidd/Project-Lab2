@@ -44,7 +44,7 @@ app.use(express.urlencoded({extended: true })) //for accepting form data
 app.get('/',  requireAuth , (req, res) => {
   // res.render('allStocks.ejs',{ stocks: stocks })
   // ,console.log(stocks.Symbol)
-  res.redirect('/stocks')
+  res.redirect('/favourites')
 })
 //
 
@@ -120,7 +120,7 @@ var util = require('util');
 var yahooFinance = require('yahoo-finance');
 
 
-app.get('/stocks/:Symbol', async (req, res) => {
+app.get('/stocks/:Symbol', requireAuth, async (req, res) => {
   const symbol= req.params.Symbol
   // console.log(Symbol)
   
@@ -174,7 +174,7 @@ if (day.length < 2)
  }
  )
 //
-app.get('/favourites',  (req, res) => {
+app.get('/favourites', requireAuth, (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
    Stock.find()
@@ -188,7 +188,7 @@ app.get('/favourites',  (req, res) => {
 }
 )
 
-app.get('/search',  async (req, res) => {
+app.get('/search', requireAuth, async (req, res) => {
   
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   //var data= req.query
@@ -270,3 +270,11 @@ app.use(authRoutes)
 //dfdfdf
 
 // fdfghgd
+
+
+
+//footer
+//dátum
+// stock oldalon a hibák javítása
+//profil view
+//login és register view
