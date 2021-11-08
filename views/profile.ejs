@@ -1,2 +1,28 @@
-<p>Your name: <%= user.name %></p>
-<p>the email you registered with: <%= user.email %></p>
+
+    <!DOCTYPE html>
+<html>
+<%- include('./partials/style.ejs') %>
+<body>
+	<%- include('./partials/header.ejs') %>
+
+<div id="container"><main class="column" id="center">
+<article>
+    <h2>Here is your profile info </h2>
+    <br></br>
+    <p>Your name: </p> 
+    <div class="mb-4">
+        <p class="text-success"><%= user.name %></p>
+    </div>
+    <p class="mt-1">The email you registered with: </p>
+    <p class="text-success"><%= user.email %></p>
+
+
+
+</article>
+</main>
+<%- include('./partials/menu.ejs')%>
+
+</div>
+<%- include('./partials/footer.ejs')%>
+</body>
+</html>
