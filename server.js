@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const Stock= require('./models/stockModel')
 const User= require('./models/userModel')
 const cookieParser = require('cookie-parser')
-const {requireAuth} = require('./middleware/authMiddleware')
+const {requireAuth, checkUser} = require('./middleware/authMiddleware')
 
 const authRoutes = require('./routes/authRoutes')
 
@@ -37,6 +37,8 @@ app.use(express.static('public'))
 app.use(express.json()) //postman teszthez ,(backend teszt)
 
 app.use(cookieParser())
+
+// app.get('*', checkUser) //ez kéne ha injectelni akarjuk a user datat az összes viewba
 
 //view engine
 app.set('view engine', 'ejs')
@@ -160,12 +162,12 @@ if (day.length < 2)
 })
 
 
- app.get('/asd',  (req, res) => {
+ app.get('/profile',  checkUser, (req, res) => {
 //   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   
 //    Stock.find()
 //   .then((result) => {
-  res.render('asd')
+  res.render('profile')
 //     res.render('fav', {result: result})
 //   })
 //   .catch((err) => {
