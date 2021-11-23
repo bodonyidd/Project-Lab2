@@ -106,6 +106,7 @@ app.get('/db',  (req, res) => {
 
 app.get('/stocks', requireAuth, (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+  console.log("----------------------------")
   console.log("stocks")
   Stock.find()
   .then((result) => {
@@ -121,8 +122,9 @@ app.get('/stocks', requireAuth, (req, res) => {
 var util = require('util');
 var yahooFinance = require('yahoo-finance');
 
-app.post('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
-  console.log("addfav POST")
+app.post('/addfav/add/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("addfav add POST")
   // console.log(req.body)
   // const Symbol = req.body.Symbol
   console.log(req.params)
@@ -139,14 +141,40 @@ app.post('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
   }
 res.redirect('/addfav/'+symbol)}
 )
+app.post('/addfav/del/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("addfav del POST")
+  // console.log(req.body)
+  // const Symbol = req.body.Symbol
+  console.log(req.params)
+  const symbol = req.params.Symbol;
+  console.log("POST")
+  console.log(symbol)
+  const output = await Stock.findOne({Symbol: symbol})
+  console.log(output)
+  if (output){
+
+      res.locals.user._favourites.pull(output._id);
+      res.locals.user.save();
+      // console.log(output);
+  }
+  console.log("res.locals.user._favourites: ", res.locals.user._favourites)
+  console.log("res.locals.user: ", res.locals.user)
+res.redirect('/addfav/'+symbol)}
+
+)
+
+
 app.get('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
   console.log("addfav GET")
   const symbol = req.params.Symbol
   console.log("symbol:",symbol)
   res.render("addfav",{adat: symbol})})
 
 app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
-    const symbol = req.params.Symbol;
+  console.log("----------------------------")  
+  const symbol = req.params.Symbol;
     console.log("req.body:")
     console.log(req.body)
     console.log("ADDFAV")
@@ -160,10 +188,11 @@ app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
     }
     console.log(req.params)
     console.log(req.params.Symbol)
-    res.render('addfav', {output: symbol})
+    // res.render('addfav', {output: symbol})
     
 });
 app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
   console.log("stock site")
   const symbol= req.params.Symbol
   console.log("req.params:",req.params)
@@ -199,8 +228,36 @@ if (day.length < 2)
     const output = await Stock.findOne({Symbol: symbol})//.limit(1).exec()
     console.log("Stock.FindOne:"+output)
     console.log(typeof output);
-    let favVal=0
+
+    let favVal
     console.log("favs: ", res.locals.user._favourites)
+    console.log("output id: ", output._id)
+    console.log("res.local.user._favourites id: " ,res.locals.user._favourites)
+    for (var i = 0; i < res.locals.user._favourites.length; i++) {
+      console.log("res.local.user._favourites id: " ,res.locals.user._favourites[i]._id)
+      let srch=res.locals.user._favourites[i]._id.toString().localeCompare(output._id)
+      if (srch ===0){
+        favVal=1;
+        console.log("favVal:",favVal)
+        break;
+      }else{
+      favVal=0
+      console.log("favVal:",favVal)}
+    }
+
+    // res.locals.user._favourites.forEach(element => {
+    //   console.log("element: ",element)
+
+    //   if( output._id === element._id ){
+    //     favVal=1;
+    //     console.log("favVal:",favVal)
+    //   }else{
+    //     console.log("favVal:",favVal)
+    //     favVal=0
+    //   }});
+    
+    //  console.log("true or false: ",res.locals.user._favourites.includes(output))
+    
     // if(res.locals.user._favourites._id.includes(output._id)){
     //   favVal=0
     // }else{
@@ -233,6 +290,7 @@ if (day.length < 2)
  )
 //
 app.get('/favourites', requireAuth, checkUser, (req, res) => {
+  console.log("----------------------------")
   console.log("favourites")
   var valFavs=0;
   console.log("res.locals.user._favourites: ",res.locals.user._favourites)
@@ -248,6 +306,7 @@ app.get('/favourites', requireAuth, checkUser, (req, res) => {
 })
 
 app.get('/search', requireAuth, async (req, res) => {
+  console.log("----------------------------")
   console.log("search")
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   //var data= req.query
