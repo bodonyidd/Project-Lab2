@@ -106,7 +106,7 @@ app.get('/db',  (req, res) => {
 
 app.get('/stocks', requireAuth, (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
-  
+  console.log("stocks")
   Stock.find()
   .then((result) => {
 
@@ -121,10 +121,57 @@ app.get('/stocks', requireAuth, (req, res) => {
 var util = require('util');
 var yahooFinance = require('yahoo-finance');
 
+app.post('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("addfav POST")
+  // console.log(req.body)
+  // const Symbol = req.body.Symbol
+  console.log(req.params)
+  const symbol = req.params.Symbol;
+  console.log("POST")
+  console.log(symbol)
+  const output = await Stock.findOne({Symbol: symbol})
+  console.log(output)
+  if (output){
 
-app.get('/stocks/:Symbol', requireAuth, async (req, res) => {
+      res.locals.user._favourites.addToSet(output._id);
+      res.locals.user.save();
+      // console.log(output);
+  }
+res.redirect('/addfav/'+symbol)}
+)
+app.get('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("addfav GET")
+  const symbol = req.params.Symbol
+  console.log("symbol:",symbol)
+  res.render("addfav",{adat: symbol})})
+
+app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
+    const symbol = req.params.Symbol;
+    console.log("req.body:")
+    console.log(req.body)
+    console.log("ADDFAV")
+    console.log(symbol)
+    const output = await Stock.findOne({Symbol: symbol})
+    if (output){
+
+        res.locals.user._favourites.addToSet(output._id); //nem push kell hanem add to set hogy többször ne tudja hozzáadni
+        res.locals.user.save();
+        console.log(output)
+    }
+    console.log(req.params)
+    console.log(req.params.Symbol)
+    res.render('addfav', {output: symbol})
+    
+});
+app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("stock site")
   const symbol= req.params.Symbol
+  console.log("req.params:",req.params)
+  console.log("req.params:",symbol)
+  console.log("XXXXXXXX")
   // console.log(Symbol)
+  // console.log("res.locals: ",res.locals.user)
+
   
   var d = new Date(),
     month = '' + (d.getMonth() + 1),
@@ -148,17 +195,26 @@ if (day.length < 2)
   //   }).then(eredmeny=quotes)
   // //
   //console.log( JSON.stringify(eredmeny[0]))
-  Stock.findOne({Symbol: symbol})
-  .then(output => {
-    console.log("out"+output)
+  console.log("symbol:",symbol)
+    const output = await Stock.findOne({Symbol: symbol})//.limit(1).exec()
+    console.log("Stock.FindOne:"+output)
     console.log(typeof output);
-    console.log()
-     res.render('show', {output: output, price: eredmeny[0]})
-  })//show: view, amit megjelenítsen oldal
-  .catch((err) => {
-    console.log(err)
-  })
+    let favVal=0
+    console.log("favs: ", res.locals.user._favourites)
+    // if(res.locals.user._favourites._id.includes(output._id)){
+    //   favVal=0
+    // }else{
+    //   favVal=1
+    // }
+    console.log("favVal:",favVal)
+    // });
 
+    console.log()
+    if(output != null){
+     res.render('show', {output: output, price: eredmeny[0],favVal: favVal})
+    }else { console.log("BUG")} 
+     //a req.params elsőnek megkapta a Symbolt de aztán vmiért frissült és a képet kapta meg és
+     // az nem volt benne a DB ben,ami problémát okozott
 })
 
 
@@ -176,22 +232,23 @@ if (day.length < 2)
  }
  )
 //
-app.get('/favourites', requireAuth, (req, res) => {
-  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+app.get('/favourites', requireAuth, checkUser, (req, res) => {
+  console.log("favourites")
+  var valFavs=0;
+  console.log("res.locals.user._favourites: ",res.locals.user._favourites)
+  try {const favs = res.locals.user._favourites ;
+    if(res.locals.user._favourites!= null)
+    {
+      valFavs=favs
+    };}
+  catch (err) {console.log(err)}
   
-   Stock.find()
-  .then((result) => {
-
-    res.render('fav', {result: result})
-  })
-  .catch((err) => {
-        console.log(err)
-      })
-}
-)
+  // const output = await Stock.findById({_id: favs})
+  res.render('fav', {result: valFavs});
+})
 
 app.get('/search', requireAuth, async (req, res) => {
-  
+  console.log("search")
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   //var data= req.query
   //res.render('proba', {kuki: data})
@@ -279,4 +336,5 @@ app.use(authRoutes)
 //dátum
 // stock oldalon a hibák javítása
 //profil view
+
 //login és register view

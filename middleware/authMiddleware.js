@@ -33,7 +33,7 @@ const checkUser =  async(req,res,next) => {
             next()
         }else{
             console.log("ddToken:"+decodedToken); //ismétlés: payload: maga az adat ,decodedToken: a user id-t tartalmazza!
-            let user = await User.findById(decodedToken.id);
+            let user = await User.findById(decodedToken.id).populate('_favourites');
             console.log(user);
             res.locals.user = user;
             next()
