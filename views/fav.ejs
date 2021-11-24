@@ -1,0 +1,43 @@
+
+<!-- 
+<html>
+    <head>
+        <title>Function Demo</title>
+    </head>
+    <body>
+        <h3>Greetings from GeeksforGeeks</h3>
+    </body>
+    </html> -->
+
+    <!DOCTYPE html>
+<html>
+	<%- include('./partials/style.ejs')%>
+<body>
+	<%- include('./partials/header.ejs')%>
+
+<div id="container"><main class="column" id="center">
+<article>
+<!-- <h1>Heading</h1> -->
+
+<!-- <h3>Here are your favourite stocks!</h3> -->
+<h3>Here are your favourite NASDAQ stocks </h3>
+
+<!-- <form action="/logout?_method=DELETE" method="POST">
+  <button type="submit">Log Out</button>
+</form> -->
+
+
+<%- include('./partials/stockbox.ejs')%>
+</article>
+</main>
+<%- include('./partials/menu.ejs')%>
+
+<!-- <div class="column" id="right">
+<h3>Right heading</h3>
+
+<p><script>generateText(1)</script></p>
+</div> -->
+</div>
+<%- include('./partials/footer.ejs')%>
+</body>
+</html>
