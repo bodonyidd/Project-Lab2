@@ -12,7 +12,7 @@ const authRoutes = require('./routes/authRoutes')
 //DB: stocksAtlasOne
 //user1
 //test1234
-//proba DB: asd123
+//a proba DB: asd123
 
 //ide a DB nevét kell írni
 const dbURI="mongodb+srv://user1:test1234@cluster0.vaq5p.mongodb.net/stocksAtlasOne?retryWrites=true&w=majority"
@@ -122,7 +122,90 @@ var util = require('util');
 var yahooFinance = require('yahoo-finance');
 
 
+<<<<<<< Updated upstream
 app.get('/stocks/:Symbol', requireAuth, async (req, res) => {
+=======
+//addfav-hoz lehetne egy routert írni 
+app.post('/addfav/add/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("addfav add POST")
+  // console.log(req.body)
+  // const Symbol = req.body.Symbol
+  console.log(req.params)
+  const symbol = req.params.Symbol;
+  console.log("POST")
+  console.log(symbol)
+  const output = await Stock.findOne({Symbol: symbol})
+  console.log(output)
+  if (output){
+
+      res.locals.user._favourites.addToSet(output._id);
+      res.locals.user.save();
+      // console.log(output);
+  }
+  
+  res.redirect('/addfav/'+symbol)}
+// res.redirect('/stocks/'+symbol)}  // "stock" volt az addfav helyett de úgy nem akarta frissíteni az oldalt és ez azért is lett beiktatva hogy kiírja "successful" 
+)
+app.post('/addfav/del/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("addfav del POST")
+  // console.log(req.body)
+  // const Symbol = req.body.Symbol
+  console.log(req.params)
+  const symbol = req.params.Symbol;
+  console.log("POST")
+  console.log(symbol)
+  const output = await Stock.findOne({Symbol: symbol})
+  console.log(output)
+  if (output){
+
+      res.locals.user._favourites.pull(output._id);
+      res.locals.user.save();
+      // console.log(output);
+  }
+  console.log("res.locals.user._favourites: ", res.locals.user._favourites)
+  console.log("res.locals.user: ", res.locals.user)
+  
+  res.redirect('/addfav/'+symbol)}
+// res.redirect('/stocks/'+symbol)}  // "stock" volt az addfav helyett de úgy nem akarta frissíteni az oldalt és ez azért is lett beiktatva hogy kiírja "successful" 
+)
+
+  //és hogy frissítse a gombot (amit akkor frissít ha a /stocks/XYZ frissül ,de az vmiért nem akar a res.redirect-tel)
+ // ha akarom hogy kiírja hogy "successful" 
+app.get('/addfav/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("addfav GET")
+  const symbol = req.params.Symbol
+  console.log("symbol:",symbol)
+  res.render("addfav",{adat: symbol})})
+  // res.redirect('/stocks/'+symbol)}) //ezt is megpróbáltam de 20ból 1x talán ha bugos ,így maradok az eredeti verziónál
+
+
+//teszteléshez ez jó!
+app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")  
+  const symbol = req.params.Symbol;
+    console.log("req.body:")
+    console.log(req.body)
+    console.log("ADDFAV")
+    console.log(symbol)
+    const output = await Stock.findOne({Symbol: symbol})
+    if (output){
+
+        res.locals.user._favourites.addToSet(output._id); //nem push kell hanem add to set hogy többször ne tudja hozzáadni
+        res.locals.user.save();
+        console.log(output)
+    }
+    console.log(req.params)
+    console.log(req.params.Symbol)
+    // res.render('addfav', {output: symbol})
+    
+});
+app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
+  console.log("----------------------------")
+  console.log("stock site")
+>>>>>>> Stashed changes
   const symbol= req.params.Symbol
   // console.log(Symbol)
   
@@ -152,6 +235,47 @@ if (day.length < 2)
   .then(output => {
     console.log("out"+output)
     console.log(typeof output);
+<<<<<<< Updated upstream
+=======
+
+    let favVal
+    console.log("favs: ", res.locals.user._favourites)
+    // console.log("output id: ", output._id)
+    console.log("res.local.user._favourites id: " ,res.locals.user._favourites)
+    for (var i = 0; i < res.locals.user._favourites.length; i++) {
+      console.log("res.local.user._favourites id: " ,res.locals.user._favourites[i]._id)
+      let srch=res.locals.user._favourites[i]._id.toString().localeCompare(output._id)
+      if (srch ===0){
+        favVal=1;
+        console.log("favVal:",favVal)
+        break;
+      }else{
+      favVal=0
+      console.log("favVal:",favVal)}
+    }
+
+    // res.locals.user._favourites.forEach(element => {
+    //   console.log("element: ",element)
+
+    //   if( output._id === element._id ){
+    //     favVal=1;
+    //     console.log("favVal:",favVal)
+    //   }else{
+    //     console.log("favVal:",favVal)
+    //     favVal=0
+    //   }});
+    
+    //  console.log("true or false: ",res.locals.user._favourites.includes(output))
+    
+    // if(res.locals.user._favourites._id.includes(output._id)){
+    //   favVal=0
+    // }else{
+    //   favVal=1
+    // }
+    console.log("favVal:",favVal)
+    // });
+
+>>>>>>> Stashed changes
     console.log()
      res.render('show', {output: output, price: eredmeny[0]})
   })//show: view, amit megjelenítsen oldal

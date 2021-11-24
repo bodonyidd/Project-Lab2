@@ -50,12 +50,12 @@ const createToken = (id) =>{
 
 
 module.exports.signup_get = (req, res) => {
-    res.render('signupcopy')
+    res.render('signup')
 }
 
 
 module.exports.login_get = (req, res) => {
-    res.render('logincopy')
+    res.render('login')
 }
 
 //db műveletek

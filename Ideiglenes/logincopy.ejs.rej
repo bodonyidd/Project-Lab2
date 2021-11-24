@@ -1,0 +1,8 @@
+diff a/views/logincopy.ejs b/views/logincopy.ejs	(rejected hunks)
+@@ -91,4 +91,5 @@
+         <a href="/signup" class="btn btn-outline-primary">Sign up</a>
+     </div>
+ </div>
++
+ <%- include('./partials/footer.ejs')%>
+\ No newline at end of file

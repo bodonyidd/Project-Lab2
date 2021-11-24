@@ -1,0 +1,38 @@
+diff a/views/login.ejs b/views/login.ejs	(rejected hunks)
+@@ -10,5 +10,35 @@
+     <input type="password" id="password" name="password" required>
+   </div>
+   <button type="submit">Login</button>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
++  asdf<br/>
+ </form>
+ <a href="/signup">Register</a>
+\ No newline at end of file
