@@ -348,14 +348,15 @@ else if (req.query.Description != null && req.query.Description != "") {
   res.render('search', {result: result, searchOptions: req.query})
 }
 else {
-  Stock.find({Symbol:'TSLA'})
-  .then((result) => {
-
-    res.render('search', {result: result, searchOptions: req.query})
-  })
-  .catch((err) => {
-        console.log(err)
-      })
+  //Stock.find({Symbol:'TSLA'})
+  //.then((result) => {
+//
+//    res.render('search', {result: result, searchOptions: req.query})
+  //})
+  //.catch((err) => {
+    //    console.log(err)
+      //})
+   res.render('search', {result: [], searchOptions: req.query}) }
       }
 }
 )
