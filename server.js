@@ -106,7 +106,8 @@ app.get('/db',  (req, res) => {
 
 app.get('/stocks', requireAuth, (req, res) => {
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
-  
+  console.log("----------------------------")
+  console.log("stocks")
   Stock.find()
   .then((result) => {
 
@@ -122,9 +123,6 @@ var util = require('util');
 var yahooFinance = require('yahoo-finance');
 
 
-<<<<<<< Updated upstream
-app.get('/stocks/:Symbol', requireAuth, async (req, res) => {
-=======
 //addfav-hoz lehetne egy routert írni 
 app.post('/addfav/add/:Symbol', requireAuth,checkUser, async (req, res) => {
   console.log("----------------------------")
@@ -205,9 +203,14 @@ app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
 app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
   console.log("----------------------------")
   console.log("stock site")
->>>>>>> Stashed changes
   const symbol= req.params.Symbol
+  
+  console.log("req.params:",req.params)
+  console.log("req.params:",symbol)
+  console.log("XXXXXXXX")
   // console.log(Symbol)
+  // console.log("res.locals: ",res.locals.user)
+
   
   var d = new Date(),
     month = '' + (d.getMonth() + 1),
@@ -223,7 +226,7 @@ if (day.length < 2)
   let eredmeny=await   yahooFinance.historical({
     symbol: symbol,
     from: '2012-01-01',
-    to: stockDate,//'2021-10-16',
+    to: stockDate,
     period: 'd'
     });
   //   , function (quotes) {
@@ -231,12 +234,10 @@ if (day.length < 2)
   //   }).then(eredmeny=quotes)
   // //
   //console.log( JSON.stringify(eredmeny[0]))
-  Stock.findOne({Symbol: symbol})
-  .then(output => {
-    console.log("out"+output)
+  console.log("symbol:",symbol)
+    const output = await Stock.findOne({Symbol: symbol})//.limit(1).exec()
+    console.log("Stock.FindOne:"+output)
     console.log(typeof output);
-<<<<<<< Updated upstream
-=======
 
     let favVal
     console.log("favs: ", res.locals.user._favourites)
@@ -275,14 +276,12 @@ if (day.length < 2)
     console.log("favVal:",favVal)
     // });
 
->>>>>>> Stashed changes
     console.log()
-     res.render('show', {output: output, price: eredmeny[0]})
-  })//show: view, amit megjelenítsen oldal
-  .catch((err) => {
-    console.log(err)
-  })
-
+    if(output != null){
+     res.render('show', {output: output, price: eredmeny[0],favVal: favVal})
+    }else { console.log("BUG")} 
+     //a req.params elsőnek megkapta a Symbolt de aztán vmiért frissült és a képet kapta meg és
+     // az nem volt benne a DB ben,ami problémát okozott
 })
 
 
@@ -300,22 +299,25 @@ if (day.length < 2)
  }
  )
 //
-app.get('/favourites', requireAuth, (req, res) => {
-  //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
+app.get('/favourites', requireAuth, checkUser, (req, res) => {
+  console.log("----------------------------")
+  console.log("favourites")
+  var valFavs=0;
+  console.log("res.locals.user._favourites: ",res.locals.user._favourites)
+  try {const favs = res.locals.user._favourites ;
+    if(res.locals.user._favourites!= null)
+    {
+      valFavs=favs
+    };}
+  catch (err) {console.log(err)}
   
-   Stock.find()
-  .then((result) => {
-
-    res.render('fav', {result: result})
-  })
-  .catch((err) => {
-        console.log(err)
-      })
-}
-)
+  // const output = await Stock.findById({_id: favs})
+  res.render('fav', {result: valFavs});
+})
 
 app.get('/search', requireAuth, async (req, res) => {
-  
+  console.log("----------------------------")
+  console.log("search")
   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!
   //var data= req.query
   //res.render('proba', {kuki: data})
@@ -340,7 +342,7 @@ app.get('/search', requireAuth, async (req, res) => {
 }
 else if (req.query.Description != null && req.query.Description != "") {
 
-  searchOptions.Description = new RegExp(req.query.Description, 'i')
+  searchOptions.Description = new RegExp(req.query.Description, 'i') //case insesitive
   // console.log(searchOptions.Description)
   // console.log(searchOptions)
   let result = await Stock.find(searchOptions)//{Symbol: searchOptions})
@@ -348,18 +350,19 @@ else if (req.query.Description != null && req.query.Description != "") {
   res.render('search', {result: result, searchOptions: req.query})
 }
 else {
-  //Stock.find({Symbol:'TSLA'})
-  //.then((result) => {
-//
-//    res.render('search', {result: result, searchOptions: req.query})
-  //})
-  //.catch((err) => {
-    //    console.log(err)
-      //})
-   res.render('search', {result: [], searchOptions: req.query}) }
-      }
+  // Stock.find({Symbol:'TSLA'})
+  // .then((result) => {
+
+  //   res.render('search', {result: result, searchOptions: req.query})
+  // })
+  // .catch((err) => {
+  //       console.log(err)
+  //     })
+  //     }
+  res.render('search', {result: [], searchOptions: req.query}) }
 }
 )
+
   
 
 app.use(authRoutes)
@@ -404,4 +407,5 @@ app.use(authRoutes)
 //dátum
 // stock oldalon a hibák javítása
 //profil view
+
 //login és register view

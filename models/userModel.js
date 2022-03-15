@@ -27,7 +27,10 @@ const userSchema = new  mongoose.Schema({
         required: [true, 'Please provide your password'],
         minLength: [3, 'The password should contain atleast 3 charackters']
     },
-    favourites: [String]
+    _favourites: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'stocks'
+    }]
 })
 
 
