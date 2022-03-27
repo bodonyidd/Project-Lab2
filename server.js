@@ -3,10 +3,11 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Stock= require('./models/stockModel')
 const User= require('./models/userModel')
+const TransactionM= require('./models/transactionModel')
 const cookieParser = require('cookie-parser')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware')
-
 const authRoutes = require('./routes/authRoutes')
+const yahooFinance2 = require('yahoo-finance2').default
 
 //Project: Cluster0
 //DB: stocksAtlasOne
@@ -136,7 +137,7 @@ app.post('/addfav/add/:Symbol', requireAuth,checkUser, async (req, res) => {
   if (output){
 
       res.locals.user._favourites.addToSet(output._id);
-      res.locals.user.save();
+      res.locals.user.save(); //ide lehet kell egy await mert a mentés később futhat le mint a lekérdezés (lassabban) és így időzítési probléma lehet és ezért nem frissül a gomb ,hogy "add to fav / remove to fav" és így bevárja a mentést 
       // console.log(output);
   }
 res.redirect('/addfav/'+symbol)}
@@ -189,8 +190,32 @@ app.get('/sad/:Symbol', requireAuth,checkUser, async (req, res) => {
     console.log(req.params)
     console.log(req.params.Symbol)
     // res.render('addfav', {output: symbol})
-    
+
 });
+
+
+function DateCreator(StartDate=1) { 
+  //system date > 03.27
+  //StartDate=1 > 03.28
+  //StartDate=0 > 03.27
+	var d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + (d.getDate()+StartDate),
+    year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  stockDate=[year, month, day].join('-');
+  return stockDate
+}
+
+// const asd =DateCreator(-1)
+// console.log(asd)
+
+
 app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
   console.log("----------------------------")
   console.log("stock site")
@@ -202,21 +227,17 @@ app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
   // console.log("res.locals: ",res.locals.user)
 
   
-  var d = new Date(),
-    month = '' + (d.getMonth() + 1),
-    day = '' + (d.getDate()+1),
-    year = d.getFullYear();
-
-if (month.length < 2) 
-    month = '0' + month;
-if (day.length < 2) 
-    day = '0' + day;
-
-  stockDate=[year, month, day].join('-')
+  const yesterdayDate=DateCreator(-1)
+  const todayDate=DateCreator(1)
   let eredmeny=await   yahooFinance.historical({
     symbol: symbol,
+<<<<<<< Updated upstream
     from: '2012-01-01',
     to: stockDate,//'2021-10-16',
+=======
+    from: yesterdayDate,
+    to: todayDate,
+>>>>>>> Stashed changes
     period: 'd'
     });
   //   , function (quotes) {
@@ -244,6 +265,8 @@ if (day.length < 2)
       favVal=0
       console.log("favVal:",favVal)}
     }
+
+
 
     // res.locals.user._favourites.forEach(element => {
     //   console.log("element: ",element)
@@ -274,6 +297,135 @@ if (day.length < 2)
      // az nem volt benne a DB ben,ami problémát okozott
 })
 
+app.get('/ddd', async (req, res) => {
+  const queryOptions = { lang: 'en-US', reportsCount: 1, region: 'US' };
+  const result = await yahooFinance2.insights('AAPL', queryOptions);
+  const quote = await yahooFinance2.quote('AAPL');
+  const { regularMarketPrice  } = quote;
+  const result2 = await yahooFinance2.quoteSummary("AAPL")
+  res.send({quote,result,result2})
+  // res.render('dataupload',{results: results})
+  
+})
+
+app.get('/add_transaction', async (req, res) => {
+  let results = await Stock.find().sort({Description: 1})
+  res.render('transactionAdd',{results: results})
+   
+})
+
+app.post('/add_transaction', requireAuth,checkUser,async (req, res) => {
+  const {date ,name, price,piece} = req.body
+
+  console.log(date,name,price,piece)
+  const stockData = await Stock.findOne({Description: name})
+  // console.log("stockData kiirva",stockData)
+  // console.log("stockdata id ", stockData._id)
+
+  //quantity= piece
+  const transaction =  await TransactionM.create({Date:date , _symbol: stockData._id , Price:price, Piece:piece})
+  // console.log("transaction kiirva", transaction)
+  res.locals.user._transactions.push(transaction._id); //nem push kell hanem add to set hogy többször ne tudja hozzáadni
+  res.locals.user.save();
+  
+  res.status(201).json({transaction: transaction})
+
+
+  })
+  app.get('/transactions', requireAuth, checkUser, (req, res) => {
+    console.log("----------------------------")
+    console.log("transactions")
+
+    try {
+      if (res.locals.user._transactions){
+        console.log("res.locals.user._transactions: ",res.locals.user._transactions)
+        
+
+        //res.locals.user._transactions[i].Symbol
+        // és aztán eredmény-t appendelni egy listhez és a listát is átadni
+
+        // const yesterdayDate=DateCreator(-1)
+        // const todayDate=DateCreator(1)
+        // let eredmeny=await yahooFinance.historical({
+        //   symbol: stockData.Symbol, 
+        //   from: yesterdayDate,
+        //   to: todayDate,
+        //   period: 'd'
+        //   });
+        //   console.log(eredmeny)
+
+
+          // posValue=price
+          // -eredmeny[0]['close']
+          // posValuePerCent=eredmeny[0].Close/price
+
+  res.status(201).json({posValue: price ,posValuePerCent: eredmeny[0]})
+    // if (posValuePerCent>0){
+    //   posValuePerCent=(posValuePerCent-1)*100
+    // }
+    // else{
+    //   posValuePerCent=(posValuePerCent-1)*100
+    // }
+        
+        //ide kell try catch es dolog ,try ha oké ,létezik a dolog akkor yahoo finance apival lekérdezni a dolgot ,ha nem oké akkor error
+        // be van allítva hogy hogy a result >0 akkor írja ki a dolgokat különben az írja h üres a tranzakció lista
+
+
+        // const output = await Stock.findById({_id: favs})
+        // res.render('fav', {result: valFavs});
+        // res.send(res.locals.user._transactions)
+        res.render('transactionsList', {result: res.locals.user._transactions})
+          }}
+    catch (err) {console.log(err)}
+  })
+  
+
+  app.get('/muxik', async (req, res) => {
+    posValuePerCent={
+      date: "Today",
+      open: 163.509995,
+      high: 166.350006,
+      low: 163.009995,
+      close: 165.380005,
+      adjClose: 165.380005,
+      volume: 95811400,
+      symbol: 'AAPL'
+    }
+    res.render('datas_copy',{posValuePerCent: posValuePerCent})
+     
+  })
+
+
+app.get('/datas', async (req, res) => {
+console.log("----------------------------")  
+
+  const symbol= "AAPL"
+  var d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + (d.getDate()+1),
+    year = d.getFullYear();
+
+if (month.length < 2) 
+    month = '0' + month;
+if (day.length < 2) 
+    day = '0' + day;
+
+  stockDate=[year, month, day].join('-')
+  let eredmeny=await   yahooFinance.historical({
+    symbol: symbol,
+    from: '2012-01-01',
+    to: stockDate,
+    period: '1m'
+    });
+console.log(eredmeny)
+console.log(eredmeny[0])
+console.log(eredmeny[eredmeny.length-1])
+// res.send(eredmeny)
+
+res.render('datas', {result: eredmeny[0]})
+
+
+})
 
  app.get('/profile',  checkUser, (req, res) => {
 //   //Stock.findOne({Symbol: 'AAPL'}) ezzel kell majd lekérdezni!

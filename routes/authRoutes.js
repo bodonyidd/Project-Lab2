@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const authController = require('../controllers/authController')
-
+const bcrypt = require('bcrypt')
 const { model } = require('mongoose')
 
 const router= Router()

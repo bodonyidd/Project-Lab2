@@ -30,7 +30,12 @@ const userSchema = new  mongoose.Schema({
     _favourites: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stocks'
+    }],
+    _transactions:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'transactions'
     }]
+
 })
 
 
@@ -49,38 +54,39 @@ userSchema.post('save', function(doc,next){
 
 //fire a function before doc  saved to db
 //nem arrow functiont használunk hogy a 'this' keywordot elérjük
-userSchema.pre('save', async function(next) {
-    //this >> refers to the local instance to the user
-    // console.log('user about to be created & saved',this)
+// userSchema.pre('save', async function(next) {
+//     //this >> refers to the local instance to the user
+//     console.log('user about to be created & saved',this)
     
     
-    //password hashing+salt >>biztonságot növeli a jelszavaknak
-    //(nem magát a jelszót tároljuk(plain text),+ a salt egy plusz biztonság)    
-    const salt = await bcrypt.genSalt()
-    this.password=await bcrypt.hash(this.password, salt)
+//     //password hashing+salt >>biztonságot növeli a jelszavaknak
+//     //(nem magát a jelszót tároljuk(plain text),+ a salt egy plusz biztonság)    
+//     const salt = await bcrypt.genSalt()
+//     this.password=await bcrypt.hash(this.password, salt)
 
-    next()
-    //törölhetők a nem hashelt jelszóval készült próba felhasználók, mert
-    // már csak hasheltet tárolunk és azt nézzük meg hogy
-    // a beírt+salt hash-e egyenlő e a db-ben tárolt hashhel, ami soha nem fog 
-    //egy plain textként tárolt jelszó esetén egyezni 
- })
+//     next()
+//     //törölhetők a nem hashelt jelszóval készült próba felhasználók, mert
+//     // már csak hasheltet tárolunk és azt nézzük meg hogy
+//     // a beírt+salt hash-e egyenlő e a db-ben tárolt hashhel, ami soha nem fog 
+//     //egy plain textként tárolt jelszó esetén egyezni 
+//  })
 
 
  //satic method to login user, bejelentkezéshez kell
  //a login a .statics. után a methódunk neve,amit kreálunk
- userSchema.statics.login = async function(email,password){
-     //thissel a User instancre modelre mutatunk
+//  userSchema.statics.login = async function(email,password){
+//      //thissel a User instancre modelre mutatunk
 
-    //  const user = await this.findOne({email: email}) //ez ugyanaz mint az alatta lévő
-    const user = await this.findOne({ email })
-    if(user) {
-        const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
-        if (auth){
-            return user 
-        }throw Error('incorrect password')
-    }throw Error('incorrect email')
- }
+//     //  const user = await this.findOne({email: email}) //ez ugyanaz mint az alatta lévő
+//     const user = await this.findOne({ email })
+//     if(user) {
+//         console.log(user,password)
+//         const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
+//         if (auth){
+//             return user 
+//         }throw Error('incorrect password')
+//     }throw Error('incorrect email')
+//  }
 
 const User = mongoose.model('User', userSchema)
 

@@ -2,6 +2,7 @@
 const jwt= require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
 const User = require('../models/userModel');
+const bcrypt = require('bcrypt')
 
 
 //custom error messages
@@ -35,7 +36,7 @@ const handleErrors = (err) => {
         //
         //ez a {properties} >>> destructure the properties property from the error 
         Object.values(err.errors).forEach(({properties}) => {
-            // console.log(properties)
+            console.log(properties)
             errors[properties.path]= properties.message;
         })
     }
@@ -66,13 +67,16 @@ module.exports.signup_post = async (req, res) => {
     try {
         //create creates a 'User' instance locally
         //and saves it into the database 
-        const user =  await User.create({name ,email, password}) //'visszaad' és csinál egy usert
-        console.log(user);
+        const salt = await bcrypt.genSalt()
+        const hashedPassword=await bcrypt.hash(password, salt)
+
+        const user =  await User.create({name:name ,email:email, password:hashedPassword})
         const token = createToken(user._id)
         res.cookie('jwt',token, {httpOnly: true, maxAge: maxAge*1000})
         res.status(201).json({user: user._id})
 
     } catch (err) {
+        console.log("sign up error rész")
         const errors = handleErrors(err)
         // res.status(400).send('error \n'+error)
         res.status(400).json({errors})
@@ -84,11 +88,35 @@ module.exports.signup_post = async (req, res) => {
 module.exports.login_post = async (req, res) => {
     const {email, password} = req.body
     try {
-        const user = await User.login(email,password)
-        const token = createToken(user._id)
-        res.cookie('jwt',token, {httpOnly: true, maxAge: maxAge*1000})
-        res.status(200).json({user: user._id})
+        const user = await User.findOne({ email })
+        console.log("login userkereses")
+        
+        if(user) {
+            console.log(user,password)
+        //     if(user.password === password)
+        //     {
+        //     const auth=true
+        //     console.log(auth)
+        //     console.log("egyezik a password")
+        // }
+        const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
+            if (auth){
+                console.log("bejut az auth ba")
+                const token = createToken(user._id)
+                console.log("van token")
+                res.cookie('jwt',token, {httpOnly: true, maxAge: maxAge*1000})
+                console.log("van cookie")
+                res.status(200).json({user: user._id})
+                console.log("van user")
+                // }
+    }
+            }
+        // const user = await User.login(email,password)
+        // const token = createToken(user1._id)
+        // res.cookie('jwt',token, {httpOnly: true, maxAge: maxAge*1000})
+        // res.status(200).json({user: user._id})
     } catch (err) {
+        console.log("login error rész")
         const errors = handleErrors(err)
         res.status(400).json({errors})
         

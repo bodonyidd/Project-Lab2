@@ -33,7 +33,20 @@ const checkUser =  async(req,res,next) => {
             next()
         }else{
             console.log("ddToken:"+decodedToken); //ismétlés: payload: maga az adat ,decodedToken: a user id-t tartalmazza!
-            let user = await User.findById(decodedToken.id).populate('_favourites');
+            let user = await User.findById(decodedToken.id)
+            .populate([{
+                path: '_favourites'}
+                ,{path: '_transactions',populate: {path: '_symbol'}}])
+                // populate: {
+                //     path: 'authorizations',
+                //     model: 'Authorization'
+                // },
+            // .populate('_favourites')
+            // .populate([{
+            //     populate: {
+            //     path: '_symbol',
+            //     model: 'stocks'}}
+            // ]) '_transactions'
             console.log(user);
             res.locals.user = user;
             next()
