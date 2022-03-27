@@ -1,0 +1,229 @@
+
+<!-- 
+<html>
+    <head>
+        <title>Function Demo</title>
+    </head>
+    <body>
+        <h3>Greetings from GeeksforGeeks</h3>
+    </body>
+    </html> -->
+
+    <!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	<title>3 Column Layout</title>
+	<style type="text/css">/* Layout */
+		body {
+			min-width: 630px;
+		}
+
+		#container {
+			/* stock helyeszkedés */
+			padding-left: 220px;
+			padding-right: 100px;
+		}
+		
+		#container .column {
+			position: relative;
+			float: left;
+		}
+		
+		#center {
+			padding: 30px 20px;
+			width: 100%;
+		}
+		
+		#left {
+			width: 180px;
+			padding: 0 10px;
+			right: 240px;
+			/* >> left column elhelyeszkedés függőlegesen */
+			margin-left: -98%;
+		}
+		
+		#right {
+			width: 130px;
+			padding: 0 10px;
+			margin-right: -100%;
+		}
+		
+		#footer {
+			clear: both;
+		}
+		
+		/* IE hack */
+		* html #left {
+			left: 150px;
+		}
+
+		/* Make the columns the same height as each other */
+		#container {
+			overflow: hidden;
+		}
+
+		#container .column {
+			padding-bottom: 1001em;
+			margin-bottom: -1000em;
+		}
+
+		/* Fix for the footer */
+		* html body {
+			overflow: hidden;
+		}
+		
+		* html #footer-wrapper {
+			float: left;
+			position: relative;
+			width: 100%;
+			padding-bottom: 10010px;
+			margin-bottom: -10000px;
+			background: #fff;
+		}
+
+		/* Aesthetics */
+		body {
+			margin: 0;
+			padding: 0;
+			font-family:Sans-serif;
+			line-height: 1.5em;
+		}
+		
+		p {
+			color: #555;
+		}
+
+		/* .btn-toolbar .btn {
+    		margin-bottom: 5px; 
+		} */
+		
+		nav ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+		}
+		
+		nav ul a {
+			color: darkgreen;
+			text-decoration: none;
+		}
+
+		#header, #footer {
+			font-size: large;
+			padding: 0.3em;
+			background: #BCCE98;
+		}
+
+		#left {
+			background: #DAE9BC;
+		}
+		
+		#right {
+			background: #F7FDEB;
+		}
+
+		#center {
+			background: #fff;
+		}
+
+		#container .column {
+			padding-top: 1em;
+		}
+	</style>
+	<!-- <script type="text/javascript">
+		/* =============================
+		This script generates sample text for the body content. 
+		You can remove this script and any reference to it. 
+		 ============================= */
+		var bodyText=["The smaller your reality, the more convinced you are that you know everything.", "If the facts don't fit the theory, change the facts.", "The past has no power over the present moment.", "This, too, will pass.", "</p><p>You will not be punished for your anger, you will be punished by your anger.", "Peace comes from within. Do not seek it without.", "<h3>Heading</h3><p>The most important moment of your life is now. The most important person in your life is the one you are with now, and the most important activity in your life is the one you are involved with now."]
+		function generateText(sentenceCount){
+			for (var i=0; i<sentenceCount; i++)
+			document.write(bodyText[Math.floor(Math.random()*7)]+" ")
+		}
+	</script> -->
+</head>
+<body>
+<header id="header">
+<h1>Stock watcher <img src="why-tesla-stock-is-up-tsla.jpg" width="50" height="50" alt=""> </h1> 
+</header>
+
+<div id="container"><main class="column" id="center">
+<article>
+<!-- <h1>Heading</h1> -->
+
+<!-- <h3>Here are your favourite stocks!</h3> -->
+<h3>Here are all of the NASDAQ stocks </h3>
+
+<!-- <form action="/logout?_method=DELETE" method="POST">
+  <button type="submit">Log Out</button>
+</form> -->
+
+
+<p><% stocks.forEach(stocks => { %>
+	<div class="card mt-4">
+	  <div class="card-body">
+		<h4 class="card-title"><%= stocks.Description %></h4>
+		<div class="card-text mb-2"><%= stocks.Symbol %></div>
+		<a href="/show/<%= stocks.Symbol %>" class="btn btn-success">Read More</a>
+		<!-- <a href="/asd/<%= stocks.id %>" class="btn btn-warning">Edit</a> -->
+		<!-- <form action="/articles/<%= stocks.id %>?_method=DELETE" method="POST" class="d-inline">
+		  <button type="submit" class="btn btn-danger">Delete</button>
+		</form> -->
+	  </div>
+	</div>
+  <% }) %></p>
+</article>
+</main>
+
+<nav class="column" id="left">
+
+
+<ul>
+	<div class="col-md-12 text-center ">
+	<h3>Menu</h3>
+	<!-- <a href="articles/show/edit.ejs" class="btn btn-success">Read More</a> -->
+	<!-- <button type="button" class="btn btn-warning">Favourite stocks</button> -->
+	<a href="/favourites" class="btn btn-warning mb-2" role="button">Favourite stocks</a>
+	<!-- <button type="button" class="btn btn-primary">All stocks </button> -->
+	<a href="/" class="btn btn-primary mb-2" role="button">All stocks</a>
+	<!-- <button type="button" class="btn btn-info">Profile</button> -->
+	<a href="#" class="btn btn-info mb-4" role="button">Profile</a>
+	<a href="#" class="btn btn-outline-danger mb-2" role="button">Sign out</a>
+	<!-- <button type="button" class="btn btn-danger">Sign out</button> -->
+	<!-- <li><a href="#">Link 2</a></li>
+	<li><a href="#">Link 3</a></li>
+	<li><a href="#">Link 4</a></li>
+	<li><a href="#">Link 5</a></li> -->
+	</div>
+</ul>
+
+<!-- <h3>Left heading</h3>
+
+<ul>
+	<li><a href="#">Link 1</a></li>
+	<li><a href="#">Link 2</a></li>
+	<li><a href="#">Link 3</a></li>
+	<li><a href="#">Link 4</a></li>
+	<li><a href="#">Link 5</a></li>
+</ul> -->
+</nav>
+
+<!-- <div class="column" id="right">
+<h3>Right heading</h3>
+
+<p><script>generateText(1)</script></p>
+</div> -->
+</div>
+
+<div id="footer-wrapper">
+<footer id="footer">
+<p>Stock watcher - The best site to manage your favourite stocks</p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<h2>Stock search</h2>
+<form  method="GET">
+<div>
+<label>Name of the stock</label>
+<input type="text" name="Description" value="<%=searchOptions.Description %>" >
+</div>
+<div>
+<label>Ticker-symbol</label>
+<input type="text" name="Symbol" value="<%=searchOptions.Symbol %>" >
+</div>
+<button type="submit">Search</button>
+</form>
+<div id="container"><main class="column" id="center">
+    <article>
+    
+    <p><% result.forEach(result => { %>
+        <div class="card mt-4">
+          <div class="card-body">
+            <h4 class="card-title"><%= result.Description %></h4>
+            <div class="card-text mb-2"><%= result.Symbol %></div>
+            <a href="/stocks/<%= result.Symbol %>" class="btn btn-success">Read More</a>
+            <!-- <a href="/asd/<%= result.id %>" class="btn btn-warning">Edit</a> -->
+            <!-- <form action="/articles/<%= result.id %>?_method=DELETE" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form> -->
+          </div>
+        </div>
+      <% }) %></p>
+    </article>
+
+</div>
