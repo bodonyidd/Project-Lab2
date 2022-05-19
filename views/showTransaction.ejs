@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<%- include('./partials/style.ejs') %>
+
+    <body>
+        <%- include('./partials/header2.ejs') %>
+
+            <div id="container">
+                <main class="column" id="center">
+                    <article>
+                        <h3>Here are all of the information about this transaction </h3>
+
+
+
+                        <style type="text/css">
+                            table{
+                                margin-top: 2rem;
+                            }
+                            td {
+                                display: inline-block;
+                            }
+
+                            td.spaced {
+                                margin-left: 30px;
+                            }
+
+                            tr {
+                                border-bottom: 1px solid #ddd;
+                            }
+
+                            tr:hover {
+                                background-color: #D6EEEE;
+                            }
+
+                            th.bottom-spaced {
+                                padding: 8px;
+                            }
+                        </style>
+                        <table>
+                            <tr>
+                                <th>Stock name</th>
+
+                                <td class="spaced">
+                                    <%=stockData.Description %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ticker symbol</th>
+                                <td class="spaced">
+                                    <%=stockData.Symbol %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Actual price of 1 share</th>
+                                <td class="spaced">
+                                    <%= prices %> $
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Date of purchase</th>
+                                <td class="spaced">
+                                    <%=formattedDate %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Old price of 1 share</th>
+                                <td class="spaced">
+                                    <%=transactions.Price %> $
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <td class="spaced">
+                                    <%=transactions.Piece %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bottom-spaced">--------------------------------</th>
+
+                            </tr>
+                            <tr>
+                                <th>Transaction value</th>
+                                <td class="spaced">
+                                    <%=transactions.Price*transactions.Piece %> $
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Position actual value</th>
+                                <td class="spaced">
+                                    <%= Math.round( prices*transactions.Piece * 100)/100 %> $
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Value change </th>
+                                <% if ((transactions.Price*transactions.Piece)> (prices*transactions.Piece)) { %>
+                                    <td class="spaced">-<%= Math.round(
+                                            ((transactions.Price*transactions.Piece)-(prices*transactions.Piece)) *
+                                            100)/100 %> $</td>
+                                    <% } else { %>
+                                        <td class="spaced">
+                                            <%= Math.round(
+                                                ((prices*transactions.Piece)-(transactions.Price*transactions.Piece)) *
+                                                100)/100 %> $
+                                        </td>
+                                        <% } %>
+                            </tr>
+                            <tr>
+                                <th>Value change in % </th>
+                                <% if (result> 0) { %>
+                                    <td class="spaced">+ <%=result %> %</td>
+                                    <% } else if (result < 0){ %>
+                                        <td class="spaced">
+                                            <%=result %> %
+                                        </td>
+                                        <% } %>
+                            </tr>
+                        </table>
+
+
+
+                        <div class="mb-2">
+                            <div class="mt-4">
+
+                                <form method="POST" action="/transactions/del/<%=transactions._id%>">
+                                    <button type="submit" class="btn btn-outline-warning">Remove this
+                                        transaction</button>
+                                </form>
+                                <script>
+                                    // default event hogy refreshel az oldal ,ezt írjuk felül
+                                    form.addEventListener('submit', async (e) => {
+                                        e.preventDefault()
+
+                                        try {
+                                            const res = await fetch('/transactions/del/' + transactions._id, {
+                                                method: 'POST',
+                                                // body: JSON.stringify({name: name,email: email,password: password}) az alatta lévő ugyanaz
+                                                body: JSON.stringify({ transacton_id: transactions._id }),
+                                                headers: { 'Content-Type': 'application/json' }
+                                            })
+
+                                            const data = await res.json()
+                                            if (data) {
+                                                location.assign('/transactions') //redirect from the frontend
+                                            }
+
+                                        } catch (err) {
+                                            console.log(err)
+                                        }
+
+
+                                    })
+
+
+                                </script>
+
+
+
+
+
+                            </div>
+                        </div>
+
+
+                    </article>
+                </main>
+                <%- include('./partials/menu.ejs')%>
+
+
+            </div>
+            <%- include('./partials/footer.ejs')%>
+    </body>
+
+</html>

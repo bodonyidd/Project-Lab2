@@ -34,7 +34,9 @@ console.log()
 
 
 //middleware: publicban elhelyezett képek megjelenítéséhez,css ekhez szükséges
-app.use(express.static('public'))
+// app.use(express.static('public'))
+const path = require('path')
+app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(express.json()) //postman teszthez ,(backend teszt)
 
 app.use(cookieParser())
@@ -221,6 +223,10 @@ function DateCreator(StartDate=1) {
   return stockDate
 }
 
+
+function Rounder(variable){
+  return Math.round(variable*100)/100
+}
 // const asd =DateCreator(-1)
 // console.log(asd)
 
@@ -245,12 +251,16 @@ app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
     to: todayDate,
     period: 'd'
     });
-  //   , function (quotes) {
-  //     eredmeny=quotes
-  //   }).then(eredmeny=quotes)
-  // //
-  //console.log( JSON.stringify(eredmeny[0]))
-  console.log("symbol:",symbol)
+
+  
+
+    console.log("symbol:",symbol)
+
+    eredmeny[0].low = Rounder(eredmeny[0].low)
+    eredmeny[0].high = Rounder(eredmeny[0].high)
+    eredmeny[0].open = Rounder(eredmeny[0].open)
+    eredmeny[0].close = Rounder(eredmeny[0].close)
+
     const output = await Stock.findOne({Symbol: symbol})//.limit(1).exec()
     console.log("Stock.FindOne:"+output)
     console.log(typeof output);
@@ -271,32 +281,29 @@ app.get('/stocks/:Symbol', requireAuth,checkUser, async (req, res) => {
       console.log("favVal:",favVal)}
     }
 
+    const queryOptions = { lang: 'en-US', reportsCount: 1, region: 'US' };
+    const result = await yahooFinance2.insights(symbol, queryOptions);
+    const quote = await yahooFinance2.quote(symbol);
+    // const { regularMarketPrice  } = quote;
+    const result2 = await yahooFinance2.quoteSummary(symbol)
+    console.log({quote,result,result2})
 
-
-    // res.locals.user._favourites.forEach(element => {
-    //   console.log("element: ",element)
-
-    //   if( output._id === element._id ){
-    //     favVal=1;
-    //     console.log("favVal:",favVal)
-    //   }else{
-    //     console.log("favVal:",favVal)
-    //     favVal=0
-    //   }});
     
-    //  console.log("true or false: ",res.locals.user._favourites.includes(output))
-    
-    // if(res.locals.user._favourites._id.includes(output._id)){
-    //   favVal=0
-    // }else{
-    //   favVal=1
-    // }
     console.log("favVal:",favVal)
-    // });
+    console.log(eredmeny[0])
+    console.log(eredmeny[0].date.toString())
+    const formattedDate=eredmeny[0].date.toString().slice(0,25)
+    eredmeny[0].date=formattedDate
+    
+    console.log(result2.summaryDetail.exDividendDate)
+    try{
+      const formattedDate2=result2.summaryDetail.exDividendDate.toString().slice(0,25)
+      result2.summaryDetail.exDividendDate=formattedDate2
+    }catch{result2.summaryDetail.exDividendDate=""}
 
     console.log()
     if(output != null){
-     res.render('show', {output: output, price: eredmeny[0],favVal: favVal})
+     res.render('show', {output: output, price: eredmeny[0],favVal: favVal,quote:quote,result:result,result2:result2})
     }else { console.log("BUG")} 
      //a req.params elsőnek megkapta a Symbolt de aztán vmiért frissült és a képet kapta meg és
      // az nem volt benne a DB ben,ami problémát okozott
@@ -308,18 +315,23 @@ app.get('/ddd', async (req, res) => {
   const quote = await yahooFinance2.quote('AAPL');
   const { regularMarketPrice  } = quote;
   const result2 = await yahooFinance2.quoteSummary("AAPL")
-  res.send({quote,result,result2})
+  const quote2 = await yahooFinance.quote("AAPL",["financialData","summaryProfile","earnings"])
+  //summyaryprofile : cég infókhoz
+  // earnings lehet belőle barchartot csinálni
+  //financial data > ebitda , return to assets stb mérleg szerű adatok ,debt, cash , és egyéb kiszámolt dolgok debt to equity stb 
+    
+  res.send({quote,result,result2,quote2})
   // res.render('dataupload',{results: results})
   
 })
 
-app.get('/add_transaction', async (req, res) => {
+app.get('/transactions/add/add_transaction',requireAuth,checkUser, async (req, res) => {
   let results = await Stock.find().sort({Description: 1})
   res.render('transactionAdd',{results: results})
    
 })
 
-app.post('/add_transaction', requireAuth,checkUser,async (req, res) => {
+app.post('/transactions/add/add_transaction', requireAuth,checkUser,async (req, res) => {
   const {date ,name, price,piece} = req.body
 
   console.log(date,name,price,piece)
@@ -331,75 +343,170 @@ app.post('/add_transaction', requireAuth,checkUser,async (req, res) => {
   const transaction =  await TransactionM.create({Date:date , _symbol: stockData._id , Price:price, Piece:piece})
   // console.log("transaction kiirva", transaction)
   res.locals.user._transactions.push(transaction._id); //nem push kell hanem add to set hogy többször ne tudja hozzáadni
-  res.locals.user.save();
+  await res.locals.user.save(); // hogy bevárja! időzítési probléma ellen 
   
   res.status(201).json({transaction: transaction})
 
 
   })
-  app.get('/transactions', requireAuth, checkUser, (req, res) => {
+
+app.get('/transactions', requireAuth, checkUser, async (req, res) => {
     console.log("----------------------------")
     console.log("transactions")
 
-    try {
-      if (res.locals.user._transactions){
-        console.log("res.locals.user._transactions: ",res.locals.user._transactions)
+    const prices = [];
+    if (res.locals.user._transactions){
+      try {
+      console.log("res.locals.user._transactions: ",res.locals.user._transactions)
         
-
-        //res.locals.user._transactions[i].Symbol
-        // és aztán eredmény-t appendelni egy listhez és a listát is átadni
-
-        // const yesterdayDate=DateCreator(-1)
-        // const todayDate=DateCreator(1)
-        // let eredmeny=await yahooFinance.historical({
-        //   symbol: stockData.Symbol, 
-        //   from: yesterdayDate,
-        //   to: todayDate,
-        //   period: 'd'
-        //   });
-        //   console.log(eredmeny)
-
-
-          // posValue=price
-          // -eredmeny[0]['close']
-          // posValuePerCent=eredmeny[0].Close/price
-
-  res.status(201).json({posValue: price ,posValuePerCent: eredmeny[0]})
-    // if (posValuePerCent>0){
-    //   posValuePerCent=(posValuePerCent-1)*100
-    // }
-    // else{
-    //   posValuePerCent=(posValuePerCent-1)*100
-    // }
         
-        //ide kell try catch es dolog ,try ha oké ,létezik a dolog akkor yahoo finance apival lekérdezni a dolgot ,ha nem oké akkor error
-        // be van allítva hogy hogy a result >0 akkor írja ki a dolgokat különben az írja h üres a tranzakció lista
+        for (const i in res.locals.user._transactions) {
+          console.log(i)
+          console.log("for ciklus")
+          console.log(res.locals.user._transactions[i]._symbol[0].Symbol)
+
+          const yesterdayDate=DateCreator(0)
+          const todayDate=DateCreator(1)
+          
+          let letoltottAdatok=await   yahooFinance.historical({
+            symbol: res.locals.user._transactions[i]._symbol[0].Symbol,
+            from: yesterdayDate,
+            to: todayDate,
+            period: 'd'
+          });
+          
+          // console.log("letoltottAdatok: ",letoltottAdatok)
+          prices.push(Math.round(letoltottAdatok[0].close*100)/100);
+          // console.log(typeof(letoltottAdatok[i].close))
+          // console.log("prices uj formula: ",parseFloat(prices[i][0].close).toFixed(2))
+          console.log("prices: ",prices)
+        }
+        // const result = res.locals.user._transactions
+        
+        const eredmenyek=[]
+        for (let i = 0; i < prices.length; i++) {
+          const transactionPrice= (res.locals.user._transactions[i].Price  * res.locals.user._transactions[i].Piece) 
+          const uptoDatePrice = prices[i] * res.locals.user._transactions[i].Piece
+          if(transactionPrice > uptoDatePrice) 
+          // akkor jó ha uptoDatePrice > transactionPrice ,mert akkor vettünk vmit 100 $ ért és 120$-t ér
+          {
+            const poziErtek= Math.round( ((uptoDatePrice/transactionPrice)-1)*100*100 ) /100
+            eredmenyek.push(poziErtek)
+          }else {
+            const poziErtek= Math.round( ((uptoDatePrice/transactionPrice)-1)*100*100 ) /100
+            eredmenyek.push(poziErtek)
+          }
+        }
 
 
-        // const output = await Stock.findById({_id: favs})
-        // res.render('fav', {result: valFavs});
-        // res.send(res.locals.user._transactions)
-        res.render('transactionsList', {result: res.locals.user._transactions})
-          }}
-    catch (err) {console.log(err)}
-  })
-  
 
-  app.get('/muxik', async (req, res) => {
-    posValuePerCent={
-      date: "Today",
-      open: 163.509995,
-      high: 166.350006,
-      low: 163.009995,
-      close: 165.380005,
-      adjClose: 165.380005,
-      volume: 95811400,
-      symbol: 'AAPL'
+        // muszáj lesz a for ciklst és az ifeket is itt megírni mert a / jel miatt nagyon hosszú számok jönnek ki 120.332442323
+        //kiírni azt kéne csak a főképernyőre hogy XY Inc, +304% és ha rámegyünk akkor kidobna hogy mikor vettünk mennyit stb stb
+        //most vagy dropdown css kéne a cuccokra vagy pedig egy sima saját oldal a tranzakcióknak
+        //tranzakciót törölni is kellene
+            //ha töröljük akkor a "transactions" oldalra dobna vissza 
+
+        console.log("eredmenyek ", eredmenyek)
+        res.render('transactionsList2', {transactions: res.locals.user._transactions,prices:prices,result: eredmenyek})
+
+        // if ( (result.Price  * result.Piece) > (prices[db][0].close * result.Piece) ){pass}
+
+
+
+      }
+      catch (err) { console.log(err) }
     }
-    res.render('datas_copy',{posValuePerCent: posValuePerCent})
+
      
+          
+
+  })
+  app.get('/transaction3', async (req, res) => {res.render('transactionsList5')})
+  app.get('/transaction2', async (req, res) => {res.render('transactionsList3')})
+
+
+  app.get('/transactions/:_id', requireAuth,checkUser, async (req, res) => {
+    console.log("----------------------------")
+    console.log("transcation egyedi site")
+    const id= req.params._id
+    
+    console.log("req.params:",req.params)
+    console.log("req.params:",id)
+    console.log("req.res.locals.user._transactions:",res.locals.user._transactions)
+    
+    console.log("XXXXXXXX")
+  
+    
+    const yesterdayDate=DateCreator(0)
+    const todayDate=DateCreator(1)
+    const uniqueTransaction = await TransactionM.findOne({_id: mongoose.Types.ObjectId(id)})
+    console.log("uniqueTransaction:",uniqueTransaction)
+    const uniqueTransaction_StockData= await Stock.findOne({_id: mongoose.Types.ObjectId(uniqueTransaction._symbol[0])})
+    console.log("uniqueTransaction_StockData:",uniqueTransaction_StockData)
+    
+    
+    let letoltottAdatok=await   yahooFinance.historical({
+      symbol: uniqueTransaction_StockData.Symbol,
+      from: yesterdayDate,
+      to: todayDate,
+      period: 'd'
+    });
+    const prices= Math.round(letoltottAdatok[0].close*100)/100
+
+    const transactionPrice= (uniqueTransaction.Price  * uniqueTransaction.Piece) 
+    const uptoDatePrice = prices * uniqueTransaction.Piece
+    const formattedDate=uniqueTransaction.Date.toString().slice(0,15)
+    console.log("formattedDate:",formattedDate)
+
+    let eredmenyek=0
+    if(transactionPrice > uptoDatePrice) 
+    // akkor jó ha uptoDatePrice > transactionPrice ,mert akkor vettünk vmit 100 $ ért és 120$-t ér
+    {
+      const poziErtek= Math.round( ((uptoDatePrice/transactionPrice)-1)*100*100 ) /100
+      eredmenyek= poziErtek
+    }else {
+      const poziErtek= Math.round( ((uptoDatePrice/transactionPrice)-1)*100*100 ) /100
+      eredmenyek= poziErtek
+    }
+    
+    res.render('showTransaction', {transactions: uniqueTransaction,stockData:uniqueTransaction_StockData,prices:prices,result: eredmenyek,formattedDate:formattedDate})
+
   })
 
+app.post('/transactions/del/:_id', requireAuth,checkUser, async (req, res) => {
+  try{
+    console.log(req.params._id)
+    await res.locals.user._transactions.pull(req.params._id);
+    await res.locals.user.save();
+    // res.status(201).json({transaction: req.params._id})
+    res.redirect("/transactions")
+  }  catch{
+    console.log("ERROR")}
+  })
+  app.get('/transactions4',  async (req, res) => {
+    console.log("----------------------------")
+    const letoltottAdatok=await   yahooFinance.historical({
+      symbol: "AAPL",
+      from: "2022-03-15",
+      to: "2022-04-15",
+      period: 'd'
+    });
+    
+    // console.log(letoltottAdatok)
+    const dates= []
+    const closingPrices=[]
+    for (let i = 0; i < letoltottAdatok.length; i++) {
+    
+      let formattedDate=letoltottAdatok[i].date.toISOString().slice(0,10)
+      // .toString().slice(0,15).slice(4,15)
+      dates.push(formattedDate)
+      Math.round(letoltottAdatok[0].close*100)/100
+      closingPrices.push(Math.round(letoltottAdatok[i].close*100)/100)
+    }
+    console.log(dates)
+    console.log(closingPrices)
+    res.render('transactionsList4', {dates: dates,closingPrices:closingPrices})
+  })
 
 app.get('/datas', async (req, res) => {
 console.log("----------------------------")  

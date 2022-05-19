@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "chart.js": "^3.7.1",
+    "chartjs": "^0.3.24",
     "colors": "^1.4.0",
     "cookie-parser": "^1.4.5",
     "csvtojson": "^2.0.10",
@@ -28,6 +30,8 @@
     "mongoose": "^5.13.9",
     "read-excel-file": "^5.2.10",
     "slugify": "^1.6.0",
+    "sortable": "^2.0.0",
+    "techan": "^0.8.0",
     "validator": "^13.7.0",
     "yahoo-finance": "^0.3.7",
     "yahoo-finance2": "^2.3.0"

@@ -88,8 +88,9 @@ module.exports.signup_post = async (req, res) => {
 module.exports.login_post = async (req, res) => {
     const {email, password} = req.body
     try {
-        const user = await User.findOne({ email })
+        // const user = await User.findOne({ email })
         console.log("login userkereses")
+        const user = await User.login(email,password)
         
         if(user) {
             console.log(user,password)
@@ -111,7 +112,6 @@ module.exports.login_post = async (req, res) => {
                 // }
     }
             }
-        // const user = await User.login(email,password)
         // const token = createToken(user1._id)
         // res.cookie('jwt',token, {httpOnly: true, maxAge: maxAge*1000})
         // res.status(200).json({user: user._id})

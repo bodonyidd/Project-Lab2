@@ -1,0 +1,49 @@
+<!-- 
+  Use Emmet shortcuts to even faster experience.
+  For an example: type div#root and press Tab.
+-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+      </head>
+  <body>
+    <h1 id="header"></h1>
+<div>
+    <canvas id="myChart" width="600" height="600"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = '<%-dates%>'
+
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'My First dataset',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: '<%-closingPrices%>',
+    }]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {}
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+  
+
+<script>
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
+    
+  </body>
+</html>

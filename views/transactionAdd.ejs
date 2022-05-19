@@ -1,124 +1,146 @@
 <!DOCTYPE html>
 <html>
-
+<%- include('./partials/style.ejs') %>
 <body>
+    <%- include('./partials/header2.ejs') %>
+    <style>
+        h2{
+            font-size: 2rem;
+        }
+    </style>
 
-<h1 class="mb-4">Add a transaction</h1>
-<h2 class="mb-4">You can add your stock purchase data and the system will calculate the current value of your position </h2>
-<h3 class="mb-4">Your purchase data:</h3>
+<div id="container"><main class="column" id="center">
+<article>
+<h2 class="mb-4">Add a transaction</h1>
+<h4 class="mb-4">You can add your stock purchase data and the system will calculate the current value of your position </h2>
+<h5 class="mb-4">Your purchase data:</h3>
 <form action="/transactionAdd" method="POST">
 
-    <div class="mb-1">
-        <label for="Date">Date</label>
-        <input type="date" id="date" name="date" required>
-    
-    </div>
+<div class="mb-1">
+    <label for="Date">Date</label>
+    <input type="date" id="date" name="date" required>
+
+</div>
 
 
-    <div class="mb-1">
+<div class="mb-1">
+
     
-        
-        
-        <option value="">Select the stock name</option>
-        <select class="form-control" id="dropdown" required>
-            <option value="">Select Symbol</option>
-                <% if(results.length){ %>
-                    <% for(var i = 0; i< results.length; i++) {%> 
-                        <option value="<%= results[i].Description%>"><%= results[i].Description%></option>
-                <% } } %>
-            </select>
-        
-                
-        
+    
+    <option value="">Select the stock name</option>
+    <select class="form-control" id="dropdown" required>
+        <option value="">Select Symbol</option>
+            <% if(results.length){ %>
+                <% for(var i = 0; i< results.length; i++) {%> 
+                    <option value="<%= results[i].Description%>"><%= results[i].Description%></option>
+            <% } } %>
+        </select>
+    
             
-    </div>
     
-    <!-- #if negatív akkor piros boostrap bandage 
-    else if + akkor zöld bandage
-    else szürke  -->
-    
+        
+</div>
 
-    <div class="mb-1">
-        <label for="price">price</label>
-        <input type="price" id="price" name="price" value="1.0" required> <label for="$">$</label>
-      
-    
-    </div>
-    <div class="mb-1">
-        <label for="Number of shares">Number of shares</label>
-        <input type="piece" id="piece" name="piece" value="1" required> <label for="pcs">PCS</label>
-      
-    
-    </div>
+<!-- #if negatív akkor piros boostrap bandage 
+else if + akkor zöld bandage
+else szürke  -->
 
 
-    <div class="mt-3">
-        <button type="submit" class="btn btn-success">Add</button>
-    </div>
+<div class="mb-1">
+    <label for="price">Price of 1 share</label>
+    <input type="price" id="price" name="price" value="1.0" required> <label for="$">$</label>
+  
+
+</div>
+<div class="mb-1">
+    <label for="Number of shares">Number of shares</label>
+    <input type="piece" id="piece" name="piece" value="1" required> <label for="pcs">PCS</label>
+  
+
+</div>
+
+
+<div class="mt-3">
+    <button type="submit" class="btn btn-success">Add</button>
+</div>
 </div>
 </div>
 </form>
-
+</main> </div>
 <script>
-    const form = document.querySelector('form')
+const form = document.querySelector('form')
+
+// const emailError = document.querySelector('.email.error')
+// const passwordError = document.querySelector('.password.error')
+
+
+// default event hogy refreshel az oldal ,ezt írjuk felül
+form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+
+    //reset errors
     
-    // const emailError = document.querySelector('.email.error')
-    // const passwordError = document.querySelector('.password.error')
+    // emailError.textContent = ''
+    // passwordError.textContent = ''
+    
+    //get the values 
+    // form.[az input name fieldje]
 
+    // A jó name legyen ott , a comboboxos!!!
+    const date = form.date.value 
+    var select = document.getElementById('dropdown');
+    var name = select.options[select.selectedIndex].value;
+    console.log(name); // en
 
-    // default event hogy refreshel az oldal ,ezt írjuk felül
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault()
+    // const name = form.name.value
+    const price = form.price.value //quantity= piece
+    const piece = form.piece.value
+    
 
-        //reset errors
-        
-        // emailError.textContent = ''
-        // passwordError.textContent = ''
-        
-        //get the values 
-        // form.[az input name fieldje]
+    try {
+        const res= await fetch('/transactions/add/add_transaction',{
+            method: 'POST',
+            // body: JSON.stringify({name: name,email: email,password: password}) az alatta lévő ugyanaz
+            body: JSON.stringify({ date, name,price,piece}),
+            headers: {'Content-Type': 'application/json'}
+        })
 
-        // A jó name legyen ott , a comboboxos!!!
-        const date = form.date.value 
-        var select = document.getElementById('dropdown');
-        var name = select.options[select.selectedIndex].value;
-        console.log(name); // en
+        const data = await res.json()
+        // console.log(data)
+        // if (data.errors){
+            
+        //    console.log("BAJ")
 
-        // const name = form.name.value
-        const price = form.price.value //quantity= piece
-        const piece = form.piece.value
-        
-
-        try {
-            const res= await fetch('/add_transaction',{
-                method: 'POST',
-                // body: JSON.stringify({name: name,email: email,password: password}) az alatta lévő ugyanaz
-                body: JSON.stringify({ date, name,price,piece}),
-                headers: {'Content-Type': 'application/json'}
-            })
-
-            const data = await res.json()
-            // console.log(data)
-            // if (data.errors){
-                
-            //    console.log("BAJ")
-
-            // }
-            if( data){
-                location.assign('/transactions') //redirect from the frontend
-            }
-
-        } catch (err) {
-            //ha bármi error van a fetches loginnal
-            console.log(err)
+        // }
+        if( data){
+            location.assign('/transactions') //redirect from the frontend
         }
 
+    } catch (err) {
+        //ha bármi error van a fetches loginnal
+        console.log(err)
+    }
 
-    })
+
+})
 
 
 
 
-    
+
 </script>
 
+
+
+
+
+
+</article>
+</main>
+<%- include('./partials/menu.ejs')%>
+
+
+</div>
+<%- include('./partials/footer.ejs')%>
+</body>
+</html>

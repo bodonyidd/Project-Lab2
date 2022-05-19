@@ -74,19 +74,19 @@ userSchema.post('save', function(doc,next){
 
  //satic method to login user, bejelentkezéshez kell
  //a login a .statics. után a methódunk neve,amit kreálunk
-//  userSchema.statics.login = async function(email,password){
-//      //thissel a User instancre modelre mutatunk
+ userSchema.statics.login = async function(email,password){
+     //thissel a User instancre modelre mutatunk
 
-//     //  const user = await this.findOne({email: email}) //ez ugyanaz mint az alatta lévő
-//     const user = await this.findOne({ email })
-//     if(user) {
-//         console.log(user,password)
-//         const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
-//         if (auth){
-//             return user 
-//         }throw Error('incorrect password')
-//     }throw Error('incorrect email')
-//  }
+    //  const user = await this.findOne({email: email}) //ez ugyanaz mint az alatta lévő
+    const user = await this.findOne({ email })
+    if(user) {
+        console.log(user,password)
+        const auth = await bcrypt.compare(password, user.password) //compare method megoldja az hashelést helyettünk, true ha pass ,false ha nem = 
+        if (auth){
+            return user 
+        }throw Error('incorrect password')
+    }throw Error('incorrect email')
+ }
 
 const User = mongoose.model('User', userSchema)
 
