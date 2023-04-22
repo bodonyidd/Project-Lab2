@@ -1,49 +1,371 @@
-<!-- 
-  Use Emmet shortcuts to even faster experience.
-  For an example: type div#root and press Tab.
--->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="style.css">
-      </head>
-  <body>
-    <h1 id="header"></h1>
-<div>
-    <canvas id="myChart" width="600" height="600"></canvas>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const labels = '<%-dates%>'
 
-  const data = {
-    labels: labels,
-    datasets: [{
-      label: 'My First dataset',
-      backgroundColor: 'rgb(255, 99, 132)',
-      borderColor: 'rgb(255, 99, 132)',
-      data: '<%-closingPrices%>',
-    }]
-  };
+  <%- include('./partials/style.ejs') %>
+<head>
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-2.14.0.min.js'></script>
+</head>
 
-  const config = {
-    type: 'line',
-    data: data,
-    options: {}
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js">
-  
-
-<script>
-  const myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-  );
-</script>
-
+<body>
+  <%- include('./partials/header2.ejs') %>
+  <div id="container"><main class="column" id="center">
     
-  </body>
+    <div style="margin-bottom: 1rem;"> 
+    <form method="GET">
+      <table>
+        <tr>
+          <th>
+            <div>
+              <a href="/stocks/<%= stockData.Symbol %>" style="margin-bottom: 1rem;" class="btn btn-success"> < Back</a>
+            </div>
+          </th>
+          <th><p style="margin-right: 30px"></p></th>
+          <th><h4 class="text-danger" style="margin-right: 20px">
+            <%=stockData.Description %>
+        </h4></th>
+        <th><p></p></th>
+          <th>From</th>
+          <th>To</th>
+          <th>Frequency</th>
+          <th>Data type</th>
+          <th>Chart type</th>
+          
+        </tr>
+        <tr>
+          <td>
+            <p></p>
+          </td>
+          <td>
+            <p></p>
+          </td>
+          <td><p>
+            <%= stockData.Symbol %>
+        </p></td>
+        <td>
+          <p></p>
+        </td>
+          <td><input type="date" id="fromDate" name="fromDate" value="<%=searchOptions.fromDate %>" required></td>
+          <td><input type="date" id="toDate" name="toDate" value="<%=searchOptions.toDate %>" max= <%= todaysDate %> required> </td>
+          <td><select class="form-control" name="freqDropdown" class="selectpicker" id="freqDropdown" required>
+            <option name="d" value="d">Daily</option>
+            <option name="w" value="w">Weekly</option>
+              <option name="m" value="m">Monthly</option>
+          
+                <td>
+                  <select class="form-control" name="dataDropdown" id="dataDropdown"  required>
+                  <option value="open">Open ($)</option>
+                  <option value="low">Low ($)</option>
+                  <option value="high">High ($)</option>
+                  <option value="close">Close ($)</option>
+                  <option value="volume">Volume</option>
+                  </select></td>
+
+                <td>
+          <select class="form-control" name="chartTypeDropdown" id="chartTypeDropdown" value="<%=searchOptions.chartTypeDropdown %>" required>
+          <option value="scatter">Line</option>
+          <option value="candlestick">Candle</option>
+          </select></td>
+          
+          
+          <td><button onclick="myFunction()" class="btn btn-outline-secondary">Set default values</button></td>
+          <td><button type="submit" class="btn btn-success">Redraw</button></td>
+        </tr>
+      </table>
+      <div style="margin-top: 10px;">
+        <form method="GET">
+        <table>
+          <tr>
+            <label for="smaLb">Simp. Mov. Avg.</label>
+            <input type="number" id="sma" name="sma" min="0" max="10000" value="<%=searchOptions.sma %>"style="margin-left: 10px;">
+            <input type="submit" value="Add" onclick="checkValue()" style="margin-right: 2rem;" >
+          </tr>
+          <tr></tr>
+          <tr>
+            <label for="smaLb">Simp. Mov. Avg.#2</label>
+            <input type="number" id="sma_2" name="sma_2" min="0" max="10000" value="<%=searchOptions.sma_2 %>" style="margin-left: 10px;">
+            <input type="submit" value="Add" onclick="checkValue()">
+          </tr>
+          
+        </table>
+      </form>
+      </div>
+    </form>
+  </div>
+  
+    
+    <div id='myDiv' style="
+    height: 500px;
+">
+      <!-- Plotly chart will be drawn inside this DIV -->
+    </div>
+    <div id='myDiv'>
+      <!-- Plotly chart will be drawn inside this DIV -->
+    </div>
+  <script>
+
+  if( "<%=searchOptions.freqDropdown%>" != null)
+  {
+    document.getElementById("freqDropdown").value = "<%=searchOptions.freqDropdown%>"
+  }
+
+  if( "<%=searchOptions.dataDropdown%>" != null)
+    {
+      document.getElementById("dataDropdown").value = "<%=searchOptions.dataDropdown%>"
+    }
+    console.log("<%=searchOptions.freqDropdown%>")
+    console.log("ennek értékei d,w,m. Ezek alapján honnan tudja,hogy w-weekly? vagy tényleg igy kéne és random jól sikerült elsőre.")
+if( "<%=searchOptions.chartTypeDropdown%>" != null)
+  {
+    document.getElementById("chartTypeDropdown").value = "<%=searchOptions.chartTypeDropdown%>"
+  }
+  
+  // if( mov_avg_data)
+  // {
+  //   document.getElementById("sma").value =mov_avg_data.length
+  // }
+  
+  function myFunction() {
+    var x = document.getElementById("fromDate");
+    x.setAttribute("value", "2010-01-01");
+    var y = document.getElementById("toDate");
+    y.setAttribute("value", "<%=todaysDate%>");
+    document.getElementById("freqDropdown").value="d"
+    document.getElementById("dataDropdown").value="close"
+    document.getElementById("chartTypeDropdown").value="scatter"
+    document.getElementById("sma").value=""
+    document.getElementById("sma_2").value=""
+  }
+
+
+    var datesresultsArr = [];
+    var stock_dates= <%- JSON.stringify(dates) %>
+    console.log('<%- JSON.stringify(dates[0]) %>')
+    var stock_closing_prices= <%- JSON.stringify(chartData) %>
+    var mov_avg_data = <%- JSON.stringify(mov_avg_data) %>
+    var mov_avg_data_2 = <%- JSON.stringify(mov_avg_data_2) %>
+    var chartType= <%- JSON.stringify(searchOptions.chartTypeDropdown) %>
+    var low= <%- JSON.stringify(low) %>
+    var high= <%- JSON.stringify(high) %>
+    var open= <%- JSON.stringify(open) %>
+    var close= <%- JSON.stringify(close) %>
+    console.log("close")
+    console.log(stock_closing_prices)
+    var rsi=<%- JSON.stringify(RSI) %>
+    console.log("rsi")
+    console.log(rsi)
+    var searchOptions_processed= <%- JSON.stringify(searchOptions) %>
+    console.log(searchOptions_processed)
+    
+
+    function checkValue() {
+    var x = document.getElementById("sma");
+    var currentVal = x.value;
+    if (mov_avg_data.length &&currentVal>mov_avg_data.length){
+      document.getElementById("sma").value= mov_avg_data.length;
+    }
+  }
+    console.log("mov_avg_data:",mov_avg_data[mov_avg_data.length-1])
+
+    console.log(stock_closing_prices[1])
+    console.log(stock_dates[1])
+  let adat=[]
+  if (chartType=='candlestick'){
+    trace1 = 
+    {
+        name: "<%= stockData.Symbol %>",
+        type: chartType,
+        x: stock_dates, 
+        // yaxis:'y1',
+        low: low,
+        high:high,
+        open:open,
+        close:close,
+        xaxis: 'x1', 
+        yaxis: 'y1', 
+        // y: stock_closing_prices,
+    }
+    
+  }else{
+    
+    trace1 = 
+    {
+        name: "<%= stockData.Symbol %>",
+        type: chartType,
+        x: stock_dates, 
+        // yaxis:'y1',
+        // low: low,
+        // high:high,
+        // open:open,
+        // close:close,
+        xaxis: 'x1', 
+        yaxis: 'y1', 
+        y: stock_closing_prices,
+    }
+  }
+  var sma_trace_1={}
+  if (mov_avg_data.length>0){
+    console.log("asa")
+    // trace1=[trace1]
+    sma_trace_1={
+        name: 'MA(<%= searchOptions.sma %>)',
+        x: stock_dates,  
+        y: mov_avg_data,
+        type: 'scatter',
+        xaxis: 'x1', 
+
+    }
+  }
+  var sma_trace_2={}
+  if (mov_avg_data_2.length>0){
+    console.log("asa")
+    sma_trace_2={
+        name: 'MA#2(<%= searchOptions.sma_2 %>)',
+        x: stock_dates,  
+        y: mov_avg_data_2,
+        type: 'scatter',
+        xaxis: 'x1', 
+        // yaxis: 'y2',
+      }
+    }
+
+  var trace2 ={
+          name: "RSI(14)",
+          type: "scatter",
+          x: stock_dates, 
+          y: rsi,
+          // xaxis: 'x2', 
+          yaxis: 'y2',
+          line: {
+          color: '#a262a9',
+          width: 1
+          }
+          
+        }
+  var data=[trace1,trace2]
+  if (mov_avg_data_2.length>0){
+    data.push(sma_trace_2)
+  }
+  if (mov_avg_data.length>0){
+    data.push(sma_trace_1)
+  }
+
+var layout = {
+// grid: {rows: 2, columns: 2, pattern: 'independent'},
+xaxis: {rangeslider : {
+                    'visible' : true},
+  mirror: true, 
+    showline: true,
+    anchor: 'y2', 
+    rangeselector: {buttons: [
+{
+    step: 'day',
+    stepmode: 'backward',
+    count: 1,
+    label: '1d'
+},{
+    step: 'day',
+    stepmode: 'backward',
+    count: 5,
+    label: '5d'
+},{
+    step: 'month',
+    stepmode: 'backward',
+    count: 1,
+    label: '1m'
+}, {
+    step: 'month',
+    stepmode: 'backward',
+    count: 6,
+    label: '6m'
+
+}, {
+    step: 'year',
+    stepmode: 'todate',
+    count: 1,
+    label: 'YTD'
+}, {
+
+    step: 'year',
+    stepmode: 'backward',
+    count: 1,
+    label: '1y'
+
+}, {
+    step: 'all',
+}],
+}},
+yaxis: {
+  range: [0, ],
+  domain: [0.5, 1.0], 
+  fixedrange: false
+}, yaxis2: {
+  range: [0, 100],
+    type: 'linear',  
+    domain: [0, .4], 
+  }, 
+  margin: {
+    b: 40, 
+    l: 40, 
+    r: 40, 
+    t: 60
+
+  },
+  shapes: [
+    {
+      x0: stock_dates[0], 
+      x1: stock_dates[stock_dates.length-1], 
+      y0: 30, 
+      y1: 30, 
+      line: {color: 'green'}, 
+      type: 'line',
+      yref: "y2"
+    }, 
+    {
+      x0: stock_dates[0], 
+      x1: stock_dates[stock_dates.length-1],  
+      y0: 70, 
+      y1: 70, 
+      line: {color: 'red'}, 
+      type: 'line',
+      yref: "y2"
+    }],
+  annotations: [
+    {
+      // xref="x1",
+      yref:"y2",
+      x: "paper", 
+      y: 25, 
+      font: {size: 7}, 
+      text: 'Oversold', 
+      showarrow: false
+    }, 
+    {
+      // xref="x1",
+      yref:"y2",
+      x: "paper", 
+      y: 80, 
+      font: {size: 7}, 
+      text: 'Overbought', 
+      showarrow: false
+    }]  
+  //     x: 0.001, 
+  //     y: -0.065, 
+  //     font: {size: 14}, 
+  //     text: '<b>Use range slider to select customized time period</b>', 
+  //     xref: 'paper', 
+  //     yref: 'paper', 
+  //     showarrow: false
+  //   }
+  // ],
+};
+  Plotly.newPlot('myDiv', {
+  data: data,
+  layout: layout
+})
+  </script>
+  <%- include('./partials/menu.ejs')%>
+</div>
+<%- include('./partials/footer.ejs')%>
+</body>
 </html>

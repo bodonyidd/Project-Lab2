@@ -49,10 +49,13 @@
                         <p>
                             <%= output.Symbol %>
                         </p>
-
+                        <div>
                         <% var offset=new Date() %>
                             <h5 class='mb-4'> Last update: <%= price.date %>
                             </h5>
+                            
+                                
+                            </div>
 
                             
                             <div id="table-wrapper">
@@ -188,7 +191,7 @@
 
                             <% if (favVal===1) { %>
 
-                                <form method="POST" action="/addfav/del/<%=output.Symbol%>">
+                                <form method="POST" action="/addfav/del/<%=output.Symbol%>" style="display: inline-block;">
                                     <button type="submit" class="btn btn-outline-warning">Remove from
                                         favourites</button>
                                 </form>
@@ -201,7 +204,7 @@
         
     </div> -->
                                     <!-- <a type="submit" class="btn btn-warning">Add to favourites</a> -->
-                                    <form method="POST" action="/addfav/add/<%=output.Symbol%>">
+                                    <form method="POST" action="/addfav/add/<%=output.Symbol%>" style="display: inline-block;">
                                         <!-- <input type="text" id="symbol" name="symbol" value="<%=output.Symbol%>" required> -->
                                         <!-- input type hidden: -->
                                         <button type="submit" class="btn btn-warning">Add to favourites</button>
@@ -226,6 +229,8 @@
         })
     </script> -->
                                     <% } %>
+                                    <a href="/charts/<%= output.Symbol %>" style="margin-left: 5px;" class="btn btn-success">Charts</a>
+                                    <a href="/predict/<%= output.Symbol %>" style="margin-left: 5px;" class="btn btn-success">Predict stock price</a>
                         </div>
                     </div>
 

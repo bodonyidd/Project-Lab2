@@ -1,0 +1,65 @@
+
+    <!DOCTYPE html>
+    <html>
+    <%- include('./partials/style.ejs') %>
+    <head>
+        <!-- Load plotly.js into the DOM -->
+        <script src='https://cdn.plot.ly/plotly-2.14.0.min.js'></script>
+    </head>
+    <body>
+        <%- include('./partials/header2.ejs') %>
+    
+    <div id="container"><main class="column" id="center">
+    <article>
+        <a href="/stocks/<%=stock_data.Symbol %>" style="margin-bottom: 1rem;" class="btn btn-success"> < Back</a>
+        <h2>Predicting stock price with machine learning </h2>
+        <br></br>
+        <h4>
+            According to the machine learning algorithm 
+            the next closing price of </h4><br></br> <h4 class="text-danger" style="margin-left: 20px;"><%=stock_data.Description %>, (<%=stock_data.Symbol %>) </h4> <h4>is: $ <%=predicted_price %> </h4> 
+        
+        
+            <div id='myDiv'></div>
+    
+    <script>
+        var dates= <%- JSON.stringify(dates) %>
+        var closing_prices = <%- JSON.stringify(closing_prices) %>
+        closing_prices.push(null)
+        
+        var todayDate = <%- JSON.stringify(todayDate) %>
+        var predicted_price= <%- JSON.stringify(predicted_price) %>
+        var slice_date=dates.slice(dates.length-50,dates.length)
+        var slice_closing_prices=closing_prices.slice(closing_prices.length-50,closing_prices.length)
+
+        let arr = new Array(slice_closing_prices.length).fill(null);
+        arr.push(predicted_price)
+
+        slice_date.push(todayDate)
+        var trace1 = {
+            name: "<%= stock_data.Symbol %>",
+        type: "linear",
+        x: slice_date, 
+        y: slice_closing_prices,
+    }
+    var trace2 ={
+          name: "Predicted price",
+          mode: 'markers',
+          x: slice_date, 
+          y: arr,
+          }
+var data = [ trace1, trace2 ];
+var layout = {
+  title:'Predicted price'
+};
+
+Plotly.newPlot('myDiv', data, layout);
+    </script>
+    </article>
+    </main>
+    <%- include('./partials/menu.ejs')%>
+    
+    </div>
+    <%- include('./partials/footer.ejs')%>
+    </body>
+    </html>
+    
